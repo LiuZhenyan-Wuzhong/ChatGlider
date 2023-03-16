@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  margin: 0px;
+  padding: 0px;
+}
+
+/* #root{
+  height: 100%;
+  width: 100%;
+} */
+
+html{
+  overflow: hidden;
+  /* -webkit-app-region: drag; */
+}
+
+/* #container{
+  -webkit-app-region: drag;
+} */
+
+#content{
+  -webkit-app-region: no-drag;
+}
+
+/* html,body{
+  height: 100%;
+  width: 100%;
+} */
+
+/* textarea{
+  -webkit-app-region: no-drag;
+} */
+
+button{
+  -webkit-app-region: no-drag;
+}
+
+.drag-area{
+  -webkit-app-region: drag;
+}
