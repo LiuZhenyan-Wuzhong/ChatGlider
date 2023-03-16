@@ -1,5 +1,12 @@
-/* eslint-disable prettier/prettier */
-import { AllHTMLAttributes, Context, Dispatch, SetStateAction, useContext, useRef } from 'react'
+import {
+  AllHTMLAttributes,
+  Context,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useRef
+} from 'react'
 import React, { useEffect, useState } from 'react'
 import { AppContext, AppContextI, AppMode } from '../../App'
 import { clsx } from 'clsx'
@@ -17,31 +24,24 @@ import { ReactComponent as SettingIcon } from '@renderer/assets/img/setting.svg'
 import { ReactComponent as SendIcon } from '@renderer/assets/img/send.svg'
 import api from '@renderer/api'
 import { AxiosError } from 'axios'
-
-export async function translate(text: string): Promise<string> {
-  return api
-    .sendTranslateRequest(text)
-    .then((res) => res.data)
-    .catch((err) => {
-      if (err.response) {
-        console.error('status: ', err.response.status)
-        console.error('data: ', err.response.data)
-      } else if (err.request) {
-        console.log('message: ', err.mess)
-      } else {
-        console.log('error: ', err)
-      }
-      return ''
-    })
-}
+import { ChatGPTModel } from '@renderer/api/translate'
 
 interface MainPanelProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   // context
-  const { setAppMode, setInput, input } = useContext(AppContext as Context<AppContextI>)
+  const { setAppMode, setInput, input, apiKey, setApiKey } = useContext(
+    AppContext as Context<AppContextI>
+  )
 
   // state
+
+  const [model, setModel] = useState<ChatGPTModel>(ChatGPTModel.turbo_0301)
+
+  const [inputLanguage, setInputLanguage] = useState<string>('en')
+
+  const [outputLanguage, setOutputLanguage] = useState<string>('zh-Hans')
+
   const [output, setOutput] = useState<string>('')
 
   // ref
@@ -66,6 +66,27 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
       console.error(err)
     }
   }
+
+  // callback
+  const translate = useCallback(
+    async (text: string): Promise<string> => {
+      return api
+        .sendTranslateRequest(text, model, inputLanguage, outputLanguage, apiKey)
+        .then((res) => res.data.choices[0].message.content)
+        .catch((err) => {
+          if (err.response) {
+            console.error('status: ', err.response.status)
+            console.error('data: ', err.response.data)
+          } else if (err.request) {
+            console.log('message: ', err.mess)
+          } else {
+            console.log('error: ', err)
+          }
+          return ''
+        })
+    },
+    [model, inputLanguage, outputLanguage, apiKey]
+  )
 
   // effect
   useEffect(() => {
@@ -98,26 +119,24 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
         </div>
         <div id="panel-body" className="p-4 flex flex-col gap-2 flex-grow">
           <div className="flex flex-col w-full rounded-2xl bg-white focus-within:ring-1 focus-within:ring-gray-200 focus-within:shadow">
-            <form>
-              <textarea
-                style={{ resize: 'none' }}
-                id="inputText"
-                ref={inputTextRef}
-                className="w-full h-24 p-3 rounded-t-2xl focus:outline-none"
-                placeholder="请输入要翻译的语段"
-                value={input}
-                onChange={handleChange}
-              />
-              <div className="h-12 rounded-b-2xl p-2 flex text-sm items-center justify-between">
-                <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
-                  <div>识别为</div>
-                  <div className="text-blue-500">英语</div>
-                </div>
-                <Button className="border-white" onClick={handleSend}>
-                  <SendIcon />
-                </Button>
+            <textarea
+              style={{ resize: 'none' }}
+              id="inputText"
+              ref={inputTextRef}
+              className="w-full h-24 p-3 rounded-t-2xl focus:outline-none"
+              placeholder="请输入要翻译的语段"
+              value={input}
+              onChange={handleChange}
+            />
+            <div className="h-12 rounded-b-2xl p-2 flex text-sm items-center justify-between">
+              <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
+                <div>识别为</div>
+                <div className="text-blue-500">英语</div>
               </div>
-            </form>
+              <Button className="border-white" onClick={handleSend}>
+                <SendIcon />
+              </Button>
+            </div>
           </div>
           <div className="w-full rounded-2xl bg-white p-3 flex justify-evenly">
             <div className="flex items-center gap-1">

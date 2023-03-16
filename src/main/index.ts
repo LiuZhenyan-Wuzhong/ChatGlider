@@ -45,7 +45,7 @@ function createWindow(): BrowserWindow {
     // }
     // mainWindow.setPosition(left, top)
     mainWindow.show()
-    // mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -144,8 +144,9 @@ app.whenReady().then(() => {
   ipcMain.handle('expand', async (event) => {
     state = WindowState.expand
 
-    mainWindow.setContentSize(500, 320)
+    mainWindow.setFocusable(true)
     mainWindow.setResizable(true)
+    mainWindow.setContentSize(660, 380)
 
     let text = ''
 
@@ -161,8 +162,9 @@ app.whenReady().then(() => {
   ipcMain.handle('suspension', (event) => {
     state = WindowState.suspension
 
-    mainWindow.setContentSize(31, 31)
+    mainWindow.setFocusable(false)
     mainWindow.setResizable(false)
+    mainWindow.setContentSize(31, 31)
   })
 
   ipcMain.handle('openMenu', (event) => {

@@ -1,7 +1,12 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosResponse } from 'axios'
+
+export enum ChatGPTModel {
+  turbo = 'gpt-3.5-turbo',
+  turbo_0301 = 'gpt-3.5-turbo-0301'
+}
 
 type TranslateBody = {
-  model: string
+  model: ChatGPTModel
   temperature: number
   max_tokens: number
   top_p: number
@@ -11,33 +16,26 @@ type TranslateBody = {
   stream: boolean
 }
 
-const getTranslateBody = (): TranslateBody => ({
-  model: 'gpt-3.5-turbo-0301',
-  temperature: 0,
-  max_tokens: 2000,
-  top_p: 1,
-  frequency_penalty: 1,
-  presence_penalty: 1,
-  messages: [],
-  stream: false
-})
-
 const url = '/chat/completions'
 
 const systemPrompt =
   'You are a translation engine that can only translate text and cannot interpret it.'
 
-const getUserPrompt = (text: string): string => `translate from en to zh-CN:\n\n${text} =>`
+const getUserPrompt = (text: string, inputLanguage: string, outputLanguage: string): string =>
+  `translate from ${inputLanguage} to ${outputLanguage}:\n\n${text} =>`
 
 export async function sendTranslateRequest(
   text: string,
-  apiKey?: string,
-  proxyOrigin?: string
+  model: ChatGPTModel,
+  inputLanguage: string,
+  outputLanguage: string,
+  apiKey: string
+  // proxyOrigin?: string
 ): Promise<AxiosResponse> {
   // config
-  const _apiKey = apiKey || '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'
+  const _apiKey = apiKey
 
-  const _proxyOrigin = proxyOrigin || 'https://service-8w4ctcv6-1317242412.hk.apigw.tencentcs.com'
+  const _proxyOrigin = '/api/openai'
 
   const baseURL = _proxyOrigin + '/v1'
 
@@ -47,14 +45,23 @@ export async function sendTranslateRequest(
   }
 
   // data
-  const data = getTranslateBody()
+  const data: TranslateBody = {
+    model: model,
+    temperature: 0,
+    max_tokens: 2000,
+    top_p: 1,
+    frequency_penalty: 1,
+    presence_penalty: 1,
+    messages: [],
+    stream: false
+  }
 
   data.messages.push({
     role: 'system',
     content: systemPrompt
   })
 
-  const userPrompt = getUserPrompt(text)
+  const userPrompt = getUserPrompt(text, inputLanguage, outputLanguage)
 
   data.messages.push({ role: 'user', content: userPrompt })
 

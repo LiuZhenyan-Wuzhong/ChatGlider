@@ -11,10 +11,24 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
-    resolve: {
-      alias: {
-        '@renderer': resolve('src/renderer/src')
+    server: {
+      proxy: {
+        '/api/openai': {
+          target: 'https://service-8w4ctcv6-1317242412.hk.apigw.tencentcs.com',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/api/googleapis': {
+          target: 'https://translation.googleapis.com/language/translate/v2/detect',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }
       }
+    },
+    resolve: {
+      alias: [{ find: '@renderer', replacement: resolve('src/renderer/src') }]
     },
     plugins: [react(), svgr()]
   }
