@@ -112,9 +112,9 @@ app.whenReady().then(() => {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.setZoomFactor(1.0)
 
-    // const handler = new MouseDragHandler(() => mouseDownUserCallback, mouseUpUserCallback)
+    const handler = new MouseDragHandler(mouseDownUserCallback, mouseUpUserCallback)
 
-    // handler.listen()
+    handler.listen()
   })
 
   const mouseUpUserCallback = async (): Promise<void> => {
@@ -124,10 +124,22 @@ app.whenReady().then(() => {
 
     if (isPositionOnWindow(x, y, mainWindow)) return
 
+    // re-locate
     if (state === WindowState.suspension) {
       mainWindow.setPosition(x + 10, y + 10)
 
       mainWindow.show()
+    }
+
+    // sendCopiedText
+    if (pin) {
+      try {
+        const text = await copySelectedText()
+
+        mainWindow.webContents.send('sendCopiedText', text)
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 
@@ -138,7 +150,23 @@ app.whenReady().then(() => {
 
     if (isPositionOnWindow(x, y, mainWindow)) return
 
-    mainWindow.hide()
+    if (state === WindowState.expand) {
+      if (pin) {
+        return
+      } else {
+        mainWindow.hide()
+
+        mainWindow.setFocusable(false)
+        mainWindow.setResizable(false)
+        mainWindow.setContentSize(31, 31)
+
+        state = WindowState.suspension
+
+        mainWindow.webContents.send('suspension')
+      }
+    } else {
+      mainWindow.hide()
+    }
   }
 
   ipcMain.handle('expand', async (event) => {
@@ -148,15 +176,12 @@ app.whenReady().then(() => {
     mainWindow.setResizable(true)
     mainWindow.setContentSize(660, 380)
 
-    let text = ''
-
     try {
-      text = await copySelectedText()
+      const text = await copySelectedText()
+      mainWindow.webContents.send('sendCopiedText', text)
     } catch (err) {
       console.log(err)
     }
-
-    mainWindow.webContents.send('sendCopiedText', text)
   })
 
   ipcMain.handle('suspension', (event) => {
@@ -171,8 +196,8 @@ app.whenReady().then(() => {
     console.log('openMenu')
   })
 
-  ipcMain.handle('pin', (event) => {
-    pin = !pin
+  ipcMain.handle('pin', (event, isPinVal) => {
+    pin = isPinVal
   })
 })
 

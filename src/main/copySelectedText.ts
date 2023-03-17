@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
 import robot from 'robotjs'
 import { clipboard } from 'electron'
-// import clipboard from 'clipboard'
-// const clipboard = (await import("clipboard")).default
 
 // TODO 鼠标未移动不进行复制。
 const copySelectedText = async (): Promise<string> => {

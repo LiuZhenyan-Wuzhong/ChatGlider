@@ -17,13 +17,13 @@ export default defineConfig({
           target: 'https://service-8w4ctcv6-1317242412.hk.apigw.tencentcs.com',
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          rewrite: (path) => path.replace(/^\/api\/openai/, '')
         },
         '/api/googleapis': {
           target: 'https://translation.googleapis.com/language/translate/v2/detect',
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          rewrite: (path) => path.replace(/^\/api\/googleapis/, '')
         }
       }
     },

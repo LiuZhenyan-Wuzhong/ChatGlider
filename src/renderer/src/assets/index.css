@@ -7,10 +7,10 @@
   padding: 0px;
 }
 
-/* #root{
-  height: 100%;
-  width: 100%;
-} */
+#root{
+  height: 100vh;
+  width: 100vw;
+}
 
 html{
   overflow: hidden;
@@ -40,4 +40,31 @@ button{
 
 .drag-area{
   -webkit-app-region: drag;
+}
+
+::-webkit-scrollbar {
+  display: flex;
+  width: 8px;
+  user-select: none;
+  touch-action: none;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 4px;
+  transition: all;
+  transition-duration: 150ms;
+}
+
+::-webkit-scrollbar-track:hover {
+  background-color: #eeeeee;
+  border-radius: 4px;
+  transition: all;
+  transition-duration: 150ms;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cccccc;
+  border-radius: 4px;
+  cursor: pointer;
 }
