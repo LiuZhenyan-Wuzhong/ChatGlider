@@ -14,6 +14,8 @@ export interface AppContextI {
   setAppMode: Dispatch<SetStateAction<AppMode>>
   apiKey: string
   setApiKey: Dispatch<SetStateAction<string>>
+  OpenAI_URL: string
+  setOpenAI_URL: Dispatch<SetStateAction<string>>
 }
 
 // context
@@ -35,13 +37,17 @@ export default function App({ className }: AppProps): JSX.Element {
     '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'
   )
 
+  const [OpenAI_URL, setOpenAI_URL] = useState<string>('')
+
   return (
     <AppContext.Provider
       value={{
         appMode,
         setAppMode,
         apiKey,
-        setApiKey
+        setApiKey,
+        OpenAI_URL,
+        setOpenAI_URL
       }}
     >
       <div className="transition-all duration-300 ease-in-out">

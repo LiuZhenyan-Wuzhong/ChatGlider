@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, BrowserView, screen, ipcMain, Tray, Menu } from 'electron'
+import { app, shell, BrowserWindow, screen, ipcMain, Tray, Menu } from 'electron'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import copySelectedText from './copySelectedText'

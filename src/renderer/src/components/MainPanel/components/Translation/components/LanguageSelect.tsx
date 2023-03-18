@@ -4,7 +4,7 @@ import { ReactComponent as ArrowIcon } from '@renderer/assets/img/arrow.svg'
 import { ReactComponent as CheckIcon } from '@renderer/assets/img/check.svg'
 import { clsx } from 'clsx'
 import React from 'react'
-import { Language, languageDesc } from './Translation'
+import { Language, languageDesc } from '..'
 
 // interface SelectItemProps extends AllHTMLAttributes<HTMLDivElement> {}
 

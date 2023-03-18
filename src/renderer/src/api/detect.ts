@@ -1,11 +1,12 @@
 import axios, { AxiosResponse } from 'axios'
 
 export async function sendDetectReq(
-  text: string
+  text: string,
+  apiKey: string
   // proxyOrigin?: string
 ): Promise<AxiosResponse> {
   // url
-  const _apiKey = process.env || ''
+  const _apiKey = ''
 
   const url = `/language/translate/v2/detect?key=${_apiKey}`
 
@@ -13,7 +14,7 @@ export async function sendDetectReq(
   const data = { text }
 
   // config
-  const baseURL = '/api/google'
+  const baseURL = '/api/googleapis'
 
   const config = {
     baseURL,

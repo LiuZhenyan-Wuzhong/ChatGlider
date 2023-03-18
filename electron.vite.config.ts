@@ -14,13 +14,13 @@ export default defineConfig({
     server: {
       proxy: {
         '/api/openai': {
-          target: 'https://service-8w4ctcv6-1317242412.hk.apigw.tencentcs.com',
+          target: 'https://service-8w4ctcv6-1317242412.hk.apigw.tencentcs.com/openai',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api\/openai/, '')
         },
         '/api/googleapis': {
-          target: 'https://translation.googleapis.com/language/translate/v2/detect',
+          target: 'https://service-8w4ctcv6-1317242412.hk.apigw.tencentcs.com/googleapis',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api\/googleapis/, '')

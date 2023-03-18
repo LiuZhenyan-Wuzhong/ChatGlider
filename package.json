@@ -11,24 +11,29 @@
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
-    "start": "electron-vite preview",
+    "start": "electron-forge start",
     "dev": "electron-vite dev --watch",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:win": "npm run build && electron-builder --win --config",
     "build:mac": "electron-vite build && electron-builder --mac --config",
-    "build:linux": "electron-vite build && electron-builder --linux --config"
+    "build:linux": "electron-vite build && electron-builder --linux --config",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^1.0.3",
     "@electron-toolkit/utils": "^1.0.2",
+    "@radix-ui/react-popover": "^1.0.5",
     "@radix-ui/react-select": "^1.2.1",
+    "@radix-ui/react-tabs": "^1.0.3",
+    "@radix-ui/react-toggle": "^1.0.2",
+    "@todesktop/robotjs-prebuild": "^0.6.13",
     "axios": "^1.3.4",
-    "clipboardy": "^3.0.0",
     "clsx": "^1.2.1",
-    "global-mouse-events": "^1.1.0",
+    "electron-squirrel-startup": "^1.0.0",
     "node-abi": "^3.33.0",
-    "robotjs": "^0.6.0",
+    "node-gyp": "^9.3.1",
     "vite-plugin-svgr": "^2.4.0"
   },
   "devDependencies": {
@@ -43,7 +48,6 @@
     "autoprefixer": "^10.4.14",
     "electron": "^22.3.2",
     "electron-builder": "^23.6.0",
-    "electron-rebuild": "^3.2.9",
     "electron-vite": "^1.0.20",
     "eslint": "^8.36.0",
     "eslint-config-prettier": "^8.7.0",
@@ -51,6 +55,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.21",
+    "prebuild-install": "7.1.0",
     "prettier": "^2.8.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -60,6 +65,7 @@
   },
   "license": "MIT",
   "build": {
-    "nodeGypRebuild": true
+    "nodeGypRebuild": true,
+    "npmRebuild": false
   }
 }

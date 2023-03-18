@@ -1,9 +1,9 @@
 import { sendDetectReq } from '@renderer/api/detect'
-import { AxiosError } from 'axios'
 import { AllHTMLAttributes, Context, useCallback, useContext, useEffect, useState } from 'react'
-import { MainPanelContext, MainPanelContextI } from '..'
-import { Language, languageDesc } from './Translation'
+import { MainPanelContext, MainPanelContextI } from '../../..'
+import { Language, languageDesc } from '..'
 
+const googleApiKey = ''
 interface DetectProps extends AllHTMLAttributes<HTMLDivElement> {
   languageMap: { [key: string]: languageDesc }
 }
@@ -20,19 +20,22 @@ export default function Detect({ className, languageMap }: DetectProps): JSX.Ele
   // callback
   const getLanguage = useCallback((data) => data, [])
 
-  const handleDetect = useCallback(async (input: string) => {
-    try {
-      const res = await sendDetectReq(input)
+  const handleDetect = useCallback(
+    async (input: string) => {
+      try {
+        const res = await sendDetectReq(input, googleApiKey)
 
-      const data = res.data
+        const data = res.data
 
-      setDetectLanguage(getLanguage(data))
-    } catch (err) {
-      console.error(err)
+        setDetectLanguage(getLanguage(data))
+      } catch (err) {
+        console.error(err)
 
-      setDetectLanguage(null)
-    }
-  }, [])
+        setDetectLanguage(null)
+      }
+    },
+    [googleApiKey]
+  )
 
   useEffect(() => {
     handleDetect(input)

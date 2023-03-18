@@ -18,6 +18,8 @@ type TranslateBody = {
 
 const url = '/chat/completions'
 
+const baseURL = '/api/openai/v1'
+
 const systemPrompt =
   'You are a translation engine that can only translate text and cannot interpret it.'
 
@@ -34,10 +36,6 @@ export async function sendTranslateRequest(
 ): Promise<AxiosResponse> {
   // config
   const _apiKey = apiKey
-
-  const _proxyOrigin = '/api/openai'
-
-  const baseURL = _proxyOrigin + '/v1'
 
   const config = {
     baseURL,

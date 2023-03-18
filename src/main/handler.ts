@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import mouseEvents from 'global-mouse-events'
+import ioHook from './iohook/index.cjs'
 
 export type MouseCallback = () => void
 
@@ -18,15 +17,13 @@ export class MouseDragHandler {
   }
 
   listen(): void {
-    mouseEvents.on('mousemove', (e) => this._mouseMoveHandler(e))
-
-    mouseEvents.on('mousedown', (e) => this._mouseDownHandler(e))
-
-    mouseEvents.on('mouseup', (e) => this._mouseUpHandler(e))
+    ioHook.on('mousemove', (e) => this._mouseMoveHandler(e))
+    ioHook.on('mousedown', (e) => this._mouseDownHandler(e))
+    ioHook.on('mouseup', (e) => this._mouseUpHandler(e))
   }
 
   stop(): void {
-    mouseEvents.pauseMouseEvents()
+    // ioHook.pauseMouseEvents()
   }
 
   _mouseMoveHandler(event: MouseEvent): void {
