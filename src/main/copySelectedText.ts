@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import robot from '@todesktop/robotjs-prebuild'
+import robot from 'robotjs'
 import { clipboard } from 'electron'
 
 // TODO 鼠标未移动不进行复制。

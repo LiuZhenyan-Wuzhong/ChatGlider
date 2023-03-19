@@ -1,4 +1,4 @@
-import ioHook from './iohook/index.cjs'
+import ioHook from 'iohook-forglider'
 
 export type MouseCallback = () => void
 
