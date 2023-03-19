@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, screen, ipcMain, Tray, Menu } from 'electron'
+import { app, shell, BrowserWindow, screen, ipcMain, Tray, Menu, session } from 'electron'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import copySelectedText from './copySelectedText'
@@ -19,7 +19,7 @@ function createWindow(): BrowserWindow {
     y: 700,
     type: 'toolbar',
     alwaysOnTop: true,
-    show: true,
+    show: false,
     movable: true,
     useContentSize: true,
     // skipTaskbar: true,
@@ -31,21 +31,14 @@ function createWindow(): BrowserWindow {
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, '../preload/index.js')
-      // sandbox: false,
-      // devTools: true
     }
   })
 
   // mainWindow.setAspectRatio(1)
 
   mainWindow.once('ready-to-show', () => {
-    // const { left, top } = {
-    //   left: screen.getPrimaryDisplay().workAreaSize.width - 160,
-    //   top: screen.getPrimaryDisplay().workAreaSize.height - 160
-    // }
-    // mainWindow.setPosition(left, top)
-    mainWindow.show()
-    mainWindow.webContents.openDevTools()
+    // mainWindow.show()
+    // mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -79,6 +72,7 @@ app.whenReady().then(() => {
   let state: WindowState = WindowState.suspension
   let pin = false
 
+  // contextmenu
   const contextMenu = Menu.buildFromTemplate([
     {
       label: '打开',

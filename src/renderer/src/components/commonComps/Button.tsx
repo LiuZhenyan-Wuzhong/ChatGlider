@@ -18,10 +18,10 @@ export default function Button({
       id="ping"
       className={clsx(
         'w-8 h-8 z-30 rounded-lg p-1 flex items-center justify-center border border-gray-100',
-        'hover:border hover:border-gray-300 hover:bg-gray-200 hover:shadow',
         'transition-all ease-in-out duration-200',
-        'active:bg-gray-300',
-        disabled ? 'text-gray-300' : 'text-gray-600',
+        disabled
+          ? 'text-gray-300'
+          : 'text-gray-600 hover:border hover:border-gray-300 hover:bg-gray-200 hover:shadow active:bg-gray-300',
         className
       )}
       onClick={onClick}

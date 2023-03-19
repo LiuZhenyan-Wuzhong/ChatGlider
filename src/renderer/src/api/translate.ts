@@ -16,9 +16,13 @@ type TranslateBody = {
   stream: boolean
 }
 
-const url = '/chat/completions'
+const url = '/v1/chat/completions'
 
-const baseURL = '/api/openai/v1'
+const proxyUrl =
+  window.electron.process.env.MAIN_VITE_ROOT_PROXY ||
+  'https://service-8w4ctcv6-1317242412.hk.apigw.tencentcs.com'
+
+const baseURL = proxyUrl + '/openai'
 
 const systemPrompt =
   'You are a translation engine that can only translate text and cannot interpret it.'

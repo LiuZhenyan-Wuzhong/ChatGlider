@@ -1,11 +1,14 @@
 import ioHook from 'iohook-forglider'
+import { throttle, debounce } from 'lodash'
 
 export type MouseCallback = () => void
 
 export class MouseDragHandler {
   // endPosition: Position
 
-  isMouseMoved = false
+  clickCount = 0
+
+  isMouseDragging = false
 
   _mouseUpUserCallback?: MouseCallback
 
@@ -16,33 +19,51 @@ export class MouseDragHandler {
     this._mouseDownUserCallback = mouseDownUserCallback
   }
 
-  listen(): void {
-    ioHook.on('mousemove', (e) => this._mouseMoveHandler(e))
-    ioHook.on('mousedown', (e) => this._mouseDownHandler(e))
-    ioHook.on('mouseup', (e) => this._mouseUpHandler(e))
+  listen: () => void = () => {
+    console.log('开始监听鼠标事件。')
+
+    ioHook.on('mousedrag', throttle(this._mouseDragHandler, 200))
+    ioHook.on('mousedown', this._mouseDownHandler)
+    ioHook.on('mouseup', () => {
+      this.clickCount++
+
+      debounce(this._mouseUpHandler, 300)()
+    })
+
+    ioHook.start()
   }
 
-  stop(): void {
-    // ioHook.pauseMouseEvents()
+  stop: () => void = () => {
+    ioHook.start(false)
   }
 
-  _mouseMoveHandler(event: MouseEvent): void {
-    this.isMouseMoved = true
+  _mouseDragHandler: () => void = () => {
+    this.isMouseDragging = true
   }
 
-  _mouseDownHandler(event: MouseEvent): void {
-    this.isMouseMoved = false
+  _mouseDownHandler: () => void = () => {
+    // this.isMouseDragging = false
+
+    // console.log('down')
 
     if (this._mouseDownUserCallback) {
       this._mouseDownUserCallback()
     }
   }
 
-  _mouseUpHandler(event: MouseEvent): void {
-    if (this._mouseUpUserCallback && this.isMouseMoved) {
-      this._mouseUpUserCallback()
-    }
+  _mouseUpHandler: () => void = () => {
+    // console.log('up')
 
-    this.isMouseMoved = false
+    if (this._mouseUpUserCallback) {
+      if (this.clickCount >= 2) {
+        // console.log('double click')
+
+        this._mouseUpUserCallback()
+      } else if (this.isMouseDragging) {
+        this._mouseUpUserCallback()
+      }
+    }
+    this.clickCount = 0
+    this.isMouseDragging = false
   }
 }
