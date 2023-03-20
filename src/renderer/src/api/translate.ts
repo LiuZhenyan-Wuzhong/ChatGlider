@@ -1,3 +1,5 @@
+// legacy
+
 import axios, { AxiosResponse } from 'axios'
 
 export enum ChatGPTModel {

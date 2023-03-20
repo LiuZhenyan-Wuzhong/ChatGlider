@@ -18,12 +18,12 @@ import { ReactComponent as ContactIcon } from '@renderer/assets/img/contact.svg'
 import { ReactComponent as SettingIcon } from '@renderer/assets/img/setting.svg'
 import { ReactComponent as SendIcon } from '@renderer/assets/img/send.svg'
 import { ChatGPTModel } from '@renderer/api/translate'
-import api from '@renderer/api'
 import Button from '../../../commonComps/Button'
 import { AppContext, AppContextI } from '@renderer/App'
 import { AxiosError } from 'axios'
 import { MainPanelContext, MainPanelContextI } from '../..'
 import LanguageSelect from './components/LanguageSelect'
+import TranslateAPI from '@renderer/api/openai/translateAPI'
 
 export enum Language {
   en = 'en',
@@ -51,11 +51,13 @@ export const initLanguageMap: { [key: string]: languageDesc } = {
   }
 }
 
+// const translateAPI = new TranslateAPI()
+
 interface TranslationProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 export default function Translation({ className }: TranslationProps): JSX.Element {
   // context
-  const { apiKey, setApiKey } = useContext(AppContext as Context<AppContextI>)
+  const { apiKey, openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
 
   const { input, setInput, inputFromClipBoard } = useContext(
     MainPanelContext as Context<MainPanelContextI>
@@ -79,7 +81,9 @@ export default function Translation({ className }: TranslationProps): JSX.Elemen
   // ref
   const inputTextRef = useRef<HTMLTextAreaElement>(null)
 
-  const testRef = useRef<HTMLDivElement>(null)
+  // const testRef = useRef<HTMLDivElement>(null)
+
+  const translateAPIRef = useRef(new TranslateAPI(openAIAPIRef.current))
 
   // callback
   const handleTranslate = useCallback(async () => {
@@ -126,14 +130,14 @@ export default function Translation({ className }: TranslationProps): JSX.Elemen
 
   const translate = useCallback(
     async (text: string): Promise<string> => {
-      return api
-        .sendTranslateRequest(text, model, inputLanguage, outputLanguage, apiKey)
+      return translateAPIRef.current
+        .sendTranslateRequest(text, model, inputLanguage, outputLanguage)
         .then((res) => {
           console.log(res)
           return res.data.choices[0].message.content
         })
     },
-    [model, inputLanguage, outputLanguage, apiKey]
+    [model, inputLanguage, outputLanguage, translateAPIRef]
   )
 
   const handleChange: React.ChangeEventHandler<HTMLTextAreaElement> = useCallback((e) => {
@@ -152,12 +156,6 @@ export default function Translation({ className }: TranslationProps): JSX.Elemen
       inputFromClipBoard.current = false
     }
   }, [input, autoTranslate])
-
-  // useEffect(() => {
-  //   console.log(testRef.current)
-
-  //   testRef.current?.addEventListener('resize', () => console.log('resize'))
-  // }, [testRef])
 
   return (
     <div id="panel-body" className="p-4 flex flex-col flex-grow w-full rounded-xl gap-2">

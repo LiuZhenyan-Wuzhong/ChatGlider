@@ -1,5 +1,3 @@
-import * as translateReq from './translate'
+import * as openaiReq from './openai'
 
-const indexReq = { ...translateReq }
-
-export default indexReq
+export default openaiReq

@@ -37,8 +37,8 @@ function createWindow(): BrowserWindow {
   // mainWindow.setAspectRatio(1)
 
   mainWindow.once('ready-to-show', () => {
-    // mainWindow.show()
-    // mainWindow.webContents.openDevTools()
+    mainWindow.show()
+    mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -106,9 +106,9 @@ app.whenReady().then(() => {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.setZoomFactor(1.0)
 
-    const handler = new MouseDragHandler(mouseDownUserCallback, mouseUpUserCallback)
+    // const handler = new MouseDragHandler(mouseDownUserCallback, mouseUpUserCallback)
 
-    handler.listen()
+    // handler.listen()
   })
 
   const mouseUpUserCallback = async (): Promise<void> => {
@@ -193,6 +193,8 @@ app.whenReady().then(() => {
   ipcMain.handle('pin', (event, isPinVal) => {
     pin = isPinVal
   })
+
+  ipcMain.handle('sendTranslateReq', (event) => {})
 })
 
 app.on('window-all-closed', () => {

@@ -5,6 +5,7 @@ import {
   Dispatch,
   FC,
   MouseEventHandler,
+  MutableRefObject,
   ReactNode,
   SetStateAction,
   useCallback,
@@ -27,6 +28,7 @@ import * as Tabs from '@radix-ui/react-tabs'
 import Toggle from '../commonComps/Toggle'
 import Settings from './components/Settings'
 import Button from '../commonComps/Button'
+import OpenAIAPI from '@renderer/api/openai/openaiAPI'
 
 export interface MainPanelContextI {
   input: string

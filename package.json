@@ -22,6 +22,7 @@
     "make": "electron-forge make"
   },
   "dependencies": {
+    "@alicloud/pop-core": "^1.7.12",
     "@electron-toolkit/preload": "^1.0.3",
     "@electron-toolkit/utils": "^1.0.2",
     "@radix-ui/react-popover": "^1.0.5",
@@ -29,14 +30,17 @@
     "@radix-ui/react-tabs": "^1.0.3",
     "@radix-ui/react-toggle": "^1.0.2",
     "@todesktop/robotjs-prebuild": "^0.6.13",
+    "alibabacloud-nls": "^1.0.3",
     "axios": "^1.3.4",
     "clsx": "^1.2.1",
     "electron-squirrel-startup": "^1.0.0",
+    "eventsource-parser": "^0.1.0",
     "iohook-forglider": "^1.0.1",
     "lodash": "^4.17.21",
     "node-abi": "^3.33.0",
     "node-gyp": "^9.3.1",
     "robotjs": "^0.6.0",
+    "uuid": "^9.0.0",
     "vite-plugin-svgr": "^2.4.0"
   },
   "devDependencies": {

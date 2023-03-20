@@ -13,6 +13,7 @@ import { ReactComponent as SettingIcon } from '@renderer/assets/img/setting.svg'
 import Button from '@renderer/components/commonComps/Button'
 import { clsx } from 'clsx'
 import { AppContext, AppContextI } from '@renderer/App'
+import { MainPanelContext } from '../..'
 
 enum SettingType {
   input = 'SettingType/input',
@@ -86,7 +87,7 @@ interface SettingsProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 export default function Settings({ className }: SettingsProps): JSX.Element {
   // context
-  const { apiKey, setApiKey, OpenAI_URL, setOpenAI_URL } = useContext(
+  const { apiKey, setApiKey, OpenAI_URL, setOpenAI_URL, openAIAPIRef } = useContext(
     AppContext as Context<AppContextI>
   )
 
