@@ -147,8 +147,12 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
       return translateAPIRef.current
         .sendTranslateRequest(text, model, inputLanguage, outputLanguage, stream, onMessage)
         .then((res) => {
-          console.log(res)
-          return res.data.choices[0].message.content
+          if (res instanceof Response) {
+            console.log(res) // fetch stream response
+          } else {
+            console.log(res) // axios common response
+            return res.data.choices[0].message.content
+          }
         })
     },
     [model, inputLanguage, outputLanguage, translateAPIRef]

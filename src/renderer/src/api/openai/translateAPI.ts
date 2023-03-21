@@ -27,7 +27,7 @@ export default class TranslateAPI extends APIHandlerBase {
     outputLanguage: string,
     stream?: boolean,
     onMessage?: (text: string) => void
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse | Response> {
     // path
     const path = '/v1/chat/completions'
 

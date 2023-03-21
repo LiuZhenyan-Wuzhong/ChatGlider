@@ -42,11 +42,10 @@ export default class OpenAIAPI {
     },
     signal: AbortSignal,
     onMessage: (data: string) => void
-  ): Promise<AxiosResponse> => {
+  ): Promise<Response> => {
     const { method, headers } = config
 
-    const res = await axios
-      .post(url, data, config)
+    const res = await fetch(url, { method, headers, body: JSON.stringify(data), signal })
       .then((res) => res)
       .catch((err) => {
         if (err instanceof AxiosError && err.response) {
@@ -61,8 +60,10 @@ export default class OpenAIAPI {
         }
       })
 
-    if (!res.data) {
-      throw new Error('There is no content of response: ', res.data)
+    // const resData = await res.json()
+
+    if (!res.body) {
+      throw new Error('There is no body of response: ')
     }
 
     const parser = createParser((event) => {
@@ -71,16 +72,44 @@ export default class OpenAIAPI {
       }
     })
 
-    console.log(res.data)
+    // if (!res.body.getReader) {
+    //   const body = res.body;
+    //   if (!body.on || !body.read) {
+    //     throw new ChatGPTError('unsupported "fetch" implementation');
+    //   }
+    //   body.on("readable", () => {
+    //     let chunk;
+    //     while (null !== (chunk = body.read())) {
+    //       parser.feed(chunk.toString());
+    //     }
+    //   });
+    // } else {
 
-    res.data.on('readable', () => {
-      let chunk
-      while (null !== (chunk = res.data.read())) {
-        parser.feed(chunk.toString())
-      }
-    })
+    // }
+
+    for await (const chunk of OpenAIAPI.streamAsyncIterable(res.body!)) {
+      const str = new TextDecoder().decode(chunk)
+      parser.feed(str)
+    }
 
     return res
+  }
+
+  static streamAsyncIterable = async function* (
+    stream: ReadableStream<Uint8Array>
+  ): AsyncGenerator<Uint8Array, void, unknown> {
+    const reader = stream.getReader()
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+          return
+        }
+        yield value
+      }
+    } finally {
+      reader.releaseLock()
+    }
   }
 
   openaiURL?: string
@@ -104,7 +133,7 @@ export default class OpenAIAPI {
     data: object,
     config: { headers: Partial<AxiosHeaders> },
     onMessage: (data: string) => void
-  ): Promise<AxiosResponse> => {
+  ): Promise<Response> => {
     // const fetchUrl = config.baseURL + url
 
     return OpenAIAPI.fetchSSE(
@@ -174,7 +203,7 @@ export abstract class APIHandlerBase {
     data: OpenAIReqBody,
     stream?: boolean,
     onMessage?: (text: string) => void
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse | Response> {
     // valid
     if (!this.openaiAPIValid.valid) {
       throw new Error(this.openaiAPIValid.msg)
