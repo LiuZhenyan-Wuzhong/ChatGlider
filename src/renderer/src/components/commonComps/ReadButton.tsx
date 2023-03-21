@@ -13,7 +13,7 @@ export default function ReadButton({ className, text }: ReadButtonProps): JSX.El
     (e) => {
       console.log('read')
 
-      transcribe(text, handleReceiveBuffer) // 阿里云API在esm规范下还有问题？
+      // transcribe(text, handleReceiveBuffer) // 阿里云API在esm规范下还有问题？
     },
     [text]
   )

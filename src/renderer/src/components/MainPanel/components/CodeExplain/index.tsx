@@ -308,7 +308,7 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
 
         <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow h-1/2">
           <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
-            <ReadButton text={output} />
+            {/* <ReadButton text={output} /> */}
             <Button className="border-white" onClick={handleCopy}>
               <CopyIcon className="border-white w-5 h-5" />
             </Button>
