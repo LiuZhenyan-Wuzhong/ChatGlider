@@ -129,13 +129,15 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
           )}
         >
           <SettingIcon />
-          <div
-            id="cartain"
+          {/* <div
+            id="overlay"
             className={clsx(
-              'fixed z-50 inset-0 bg-gray-500 bg-opacity-25 cursor-default rounded-2xl',
-              open ? '' : 'hidden'
+              'fixed z-40 inset-0 bg-gray-500 cursor-default rounded-2xl',
+              'data-[state=close]:hidden'
+              // open ? '' : 'hidden'
             )}
-          ></div>
+            style={{ zIndex: 999 }}
+          ></div> */}
         </button>
       </Popover.Trigger>
       <Popover.Portal>

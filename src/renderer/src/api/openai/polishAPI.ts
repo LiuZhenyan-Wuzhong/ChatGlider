@@ -21,7 +21,7 @@ export default class PolishAPI extends APIHandlerBase {
     model: ChatGPTModel,
     stream?: boolean,
     onMessage?: (text: string) => void
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse | Response> {
     // path
     const path = '/v1/chat/completions'
 

@@ -16,7 +16,7 @@ export default class DetectAPI extends APIHandlerBase {
     return `detect the language of following sentences :\n\n${text} =>`
   }
 
-  sendDetectRequest(text: string, model: ChatGPTModel): Promise<AxiosResponse> {
+  sendDetectRequest(text: string, model: ChatGPTModel): Promise<AxiosResponse | Response> {
     // path
     const path = '/v1/chat/completions'
 

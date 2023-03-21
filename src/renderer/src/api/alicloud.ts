@@ -24,9 +24,9 @@ const sendSynthesizeReq = async (
   token: string,
   onMessage: (msg: Buffer) => void = (msg: Buffer): void => {}
 ): Promise<void> => {
-  const url = 'wss://nls-gateway-cn-shanghai.aliyuncs.com/ws/v1'
+  const url = ''
 
-  const appkey = 'YTllUlYKz43Wpypv'
+  const appkey = ''
 
   const format = 'MP3'
 

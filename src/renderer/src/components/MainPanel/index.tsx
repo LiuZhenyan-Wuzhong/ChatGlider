@@ -30,9 +30,9 @@ import * as Tabs from '@radix-ui/react-tabs'
 import Toggle from '../commonComps/Toggle'
 import Settings from './components/Settings'
 import Button from '../commonComps/Button'
-import OpenAIAPI from '@renderer/api/openai/openaiAPI'
 import CodeExplain from './components/CodeExplain'
 import Polish from './components/Polish'
+import Chat from './components/Chat'
 
 export interface MainPanelContextI {
   mainInput: string
@@ -67,12 +67,12 @@ interface MainPanelProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   // context
-  const { appMode, setAppMode, apiKey, setApiKey } = useContext(AppContext as Context<AppContextI>)
+  const { appMode, setAppMode } = useContext(AppContext as Context<AppContextI>)
 
   // state
   const [mainInput, setMainInput] = useState<string>('')
 
-  const [appUsage, setAppUsage] = useState<AppUsage>(AppUsage.translation)
+  const [appUsage, setAppUsage] = useState<AppUsage>(AppUsage.chat)
 
   const [isPin, setIsPin] = useState<boolean>(false)
 
@@ -211,7 +211,9 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
             <Tabs.Content value={AppUsage.translation} asChild>
               <Translation />
             </Tabs.Content>
-            <Tabs.Content value={AppUsage.chat}> </Tabs.Content>
+            <Tabs.Content value={AppUsage.chat} asChild>
+              <Chat />
+            </Tabs.Content>
             <Tabs.Content value={AppUsage.codeExplain} asChild>
               <CodeExplain />
             </Tabs.Content>

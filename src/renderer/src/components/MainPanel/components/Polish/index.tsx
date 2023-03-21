@@ -26,6 +26,7 @@ import LanguageSelect from '../../../commonComps/Select'
 import PolishAPI from '@renderer/api/openai/polishAPI'
 import { ChatGPTModel } from '@renderer/api/openai/openaiAPI'
 import BinaryButton from '@renderer/components/commonComps/BinaryButton'
+import ReadButton from '@renderer/components/commonComps/ReadButton'
 
 export enum Language {
   en = 'en',
@@ -117,8 +118,12 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
   const polish = useCallback(
     async (text: string): Promise<string> => {
       return polishAPIRef.current.sendPolishRequest(text, model).then((res) => {
-        console.log(res)
-        return res.data.choices[0].message.content
+        if (res instanceof Response) {
+          console.log(res)
+        } else {
+          console.log(res)
+          return res.data.choices[0].message.content
+        }
       })
     },
     [model, polishAPIRef]
@@ -134,15 +139,6 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
   const handleCopy: React.MouseEventHandler<HTMLButtonElement> = useCallback(
     (e) => {
       window.electron.ipcRenderer.invoke('copy', output)
-    },
-    [output]
-  )
-
-  const handleRead: React.MouseEventHandler<HTMLButtonElement> = useCallback(
-    (e) => {
-      console.log('read')
-
-      // transcribe(output, _onReceiveBuffer)
     },
     [output]
   )
@@ -231,9 +227,7 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
 
       <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow">
         <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
-          <Button className="border-white" onClick={handleRead}>
-            <SpeakIcon className="border-white w-5 h-5" />
-          </Button>
+          <ReadButton text={output} />
           <Button className="border-white" onClick={handleCopy}>
             <CopyIcon className="border-white w-5 h-5" />
           </Button>

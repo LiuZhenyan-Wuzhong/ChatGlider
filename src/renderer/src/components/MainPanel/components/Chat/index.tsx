@@ -2,6 +2,7 @@ import {
   AllHTMLAttributes,
   Context,
   forwardRef,
+  MutableRefObject,
   useCallback,
   useContext,
   useEffect,
@@ -29,19 +30,57 @@ import { githubLightInit } from '@uiw/codemirror-theme-github'
 import { EditorView } from '@codemirror/view'
 import CodeLangSelect from '@renderer/components/commonComps/Select'
 import { v4 as uuidv4 } from 'uuid'
+import clsx from 'clsx'
 // import transcribe from '@renderer/api/alicloud'
 
 enum Role {
-  system = 'Role/system',
-  user = 'Role/user',
-  assistant = 'Role/assistant'
+  system = 'system',
+  user = 'user',
+  assistant = 'assistant'
 }
 
 type Message = {
   role: Role
   id: string
-  parentMessageId: string
-  text: string
+  parentId: string | null
+  content: string
+}
+
+type ChatPostItem = {
+  role: Role
+  content: string
+}
+
+const createMessage = (role: Role, content: string, parentId: string | null): Message => {
+  return {
+    role,
+    id: Date.now().toString(),
+    content,
+    parentId
+  }
+}
+
+interface MessageBoxProps extends AllHTMLAttributes<HTMLDivElement> {
+  message: Message
+}
+
+function MessageBox({ className, message }: MessageBoxProps): JSX.Element {
+  const { role, id, parentId, content } = message
+  return (
+    <div
+      id={id}
+      className={clsx(
+        'max-w-3/4 rounded-lg border p-3 mx-auto',
+        role === Role.assistant ? 'bg-gray-200 font-medium ml-0' : '',
+        role === Role.user ? 'bg-white mr-0' : '',
+        className
+      )}
+    >
+      <span className={clsx('font-semibold leading-6')}>{role}:</span>
+      <br />
+      <span className="text-sm">{content}</span>
+    </div>
+  )
 }
 
 interface ChatProps extends AllHTMLAttributes<HTMLDivElement> {}
@@ -53,9 +92,7 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
   const { inputFromClipBoard, stream } = useContext(MainPanelContext as Context<MainPanelContextI>)
 
   // state
-  const [input, setInput] = useState<string>(`function hello(who = "world") {
-    console.log(\`Hello, \${who}!\`)
-  }`)
+  const [input, setInput] = useState<string>(``)
 
   const [model, setModel] = useState<ChatGPTModel>(ChatGPTModel.turbo_0301)
 
@@ -74,51 +111,148 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
 
   const inputTextRef = useRef<HTMLTextAreaElement>(null)
 
+  const sendingMessageIdRef = useRef<string | null>(null)
+
+  const newestMessageIdRef = useRef<string | null>(null)
+
+  const receivingMessageRef = useRef<Message | null>(null)
+
+  const abortRef = useRef<boolean>(false)
+
+  const chatHistoryRef = useRef<HTMLDivElement>(null)
+
   // callback
-  const handleSendMessage = useCallback(async () => {
-    setIsSending(true)
+  const handleError = useCallback((err: unknown) => {
+    if (err instanceof AxiosError && err.response) {
+      console.error('status: ', err.response.status)
 
-    console.log('codeExplain: ')
+      console.error('data: ', err.message)
+    } else {
+      console.error('error: ', err)
+    }
+  }, [])
 
-    // console.log('codeExplain: ', input)
+  const handleReceivingMesError = useCallback(
+    (err: unknown, receivingMessageRef: MutableRefObject<Message>) => {
+      if (err instanceof AxiosError && err.response) {
+        console.error('status: ', err.response.status)
 
-    try {
-      const text = await codeExplain(input)
+        console.error('data: ', err.message)
 
-      setOutput(text)
-    } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        if (err.response) {
-          console.error('status: ', err.response.status)
-          console.error('data: ', err.message)
-          setOutput(err.message)
-        } else if (err.request) {
-          console.error('message: ', err.message)
-
-          setOutput(err.message.toString())
-        }
+        receivingMessageRef.current.content = `Error: ${err.response.status} ${err.message}`
       } else {
         console.error('error: ', err)
 
-        setOutput('error')
+        receivingMessageRef.current.content = `Error`
       }
+    },
+    []
+  )
+
+  const buildPrompt = async (messages: Message[]): Promise<string> => {
+    return JSON.stringify(
+      messages.map((msg) => {
+        const { role, content } = msg
+        return { role, content }
+      })
+    )
+  }
+
+  const handleSendMessage = useCallback(async () => {
+    console.log('sending chat: ', input)
+
+    setInput('')
+
+    const newMsg = createMessage(Role.user, input, newestMessageIdRef.current)
+
+    const messages = [...history, newMsg].filter((msg) => msg !== null)
+
+    setHistory(messages)
+
+    const prompt = await buildPrompt(messages)
+
+    sendingMessageIdRef.current = newMsg.id
+
+    const receivingMsg = createMessage(Role.assistant, '', sendingMessageIdRef.current)
+
+    receivingMessageRef.current = receivingMsg
+
+    setIsSending(true)
+
+    try {
+      if (stream) {
+        await sendMessage(prompt, true, onMessage)
+      } else {
+        const text = await sendMessage(prompt)
+        if (!abortRef.current) {
+          receivingMessageRef.current.content = text
+
+          setHistory((prev) => [...prev, receivingMessageRef.current!])
+        }
+      }
+    } catch (err: unknown) {
+      handleReceivingMesError(err, receivingMessageRef as MutableRefObject<Message>)
     } finally {
       setIsSending(false)
     }
-  }, [input])
+  }, [input, sendingMessageIdRef, receivingMessageRef, stream])
 
-  const handleSend: React.MouseEventHandler<HTMLButtonElement> = useCallback(
-    async (e) => {
-      handleSendMessage()
-    },
-    [handleSendMessage]
-  )
+  const onMessage = (data: string): void => {
+    if (!receivingMessageRef.current) {
+      console.log('receivingMessageRef.current is null')
 
-  const codeExplain = useCallback(
-    async (text: string): Promise<string> => {
-      return chatAPIRef.current.sendChatRequest(text, model).then((res) => {
-        console.log(res)
-        return res.data.choices[0].message.content
+      return
+    }
+
+    if (data === '[DONE]') {
+      console.log('All data is receiveed.')
+
+      console.log('Result is:', receivingMessageRef.current.content)
+
+      setHistory((prevs) => [...prevs, receivingMessageRef.current!])
+
+      setCurOutputMessage(null)
+
+      // receivingMessageRef.current = null
+
+      // sendingMessageIdRef.current = null
+
+      // sendingMessageIdRef.current = null
+
+      return
+    }
+
+    try {
+      let _a2
+      const response = JSON.parse(data)
+      if ((_a2 = response == null ? void 0 : response.choices) == null ? void 0 : _a2.length) {
+        const delta = response.choices[0].delta // chunk
+        if (delta.content) {
+          const receivingText = receivingMessageRef.current.content
+
+          receivingMessageRef.current.content = receivingText + delta.content
+
+          setCurOutputMessage(receivingMessageRef.current)
+        } else {
+          // console.error(delta)
+        }
+      } else {
+        console.error(response)
+      }
+    } catch (err) {
+      handleReceivingMesError(err, receivingMessageRef as MutableRefObject<Message>)
+    }
+  }
+
+  const sendMessage = useCallback(
+    async (text: string, stream?: boolean, onMessage?: (text: string) => void): Promise<string> => {
+      return chatAPIRef.current.sendChatRequest(text, model, stream, onMessage).then((res) => {
+        if (res instanceof Response) {
+          console.log(res)
+        } else {
+          console.log(res)
+          return res.data.choices[0].message.content
+        }
       })
     },
     [model, chatAPIRef]
@@ -130,26 +264,6 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
     },
     [setInput]
   )
-
-  const handleCopy: React.MouseEventHandler<HTMLButtonElement> = useCallback(
-    (e) => {
-      window.electron.ipcRenderer.invoke('copy', output)
-    },
-    [output]
-  )
-
-  const handleRead: React.MouseEventHandler<HTMLButtonElement> = useCallback(
-    (e) => {
-      console.log('read')
-
-      // transcribe(output, _onReceiveBuffer)
-    },
-    [output]
-  )
-
-  const _onReceiveBuffer = useCallback((msg: Buffer): void => {
-    console.log(msg)
-  }, [])
 
   const handleAbort = useCallback(async () => {
     setIsAborting(false)
@@ -182,58 +296,40 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
     [handleSendMessage, setIsSending]
   )
 
-  // effect
   useEffect(() => {
-    if (inputFromClipBoard.current) {
-      handleSendMessage()
+    if (chatHistoryRef.current) {
+      chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight
     }
-    inputFromClipBoard.current = false
-  }, [inputFromClipBoard])
+  }, [chatHistoryRef, history])
 
   return (
-    <div id="panel-body" className="relative p-4 flex flex-col flex-grow w-full rounded-xl gap-2">
-      <div className="flex flex-col">
+    <div id="panel-body" className="relative flex-grow w-full rounded-xl">
+      <div className="absolute inset-0 p-4 flex flex-col gap-2">
         <div
-          className="w-full rounded-t-xl flex flex-col p-3 h-24 bg-white overflow-auto"
-          style={{ resize: 'vertical' }}
+          id="chat-history"
+          className="flex flex-col z-10 p-3 flex-grow rounded-xl bg-white overflow-y-scroll gap-4"
+          ref={chatHistoryRef}
         >
+          {history.map((message) => message && <MessageBox message={message} key={message.id} />)}
+          {curOutputMessage && <MessageBox message={curOutputMessage} />}
+        </div>
+        <div id="chat-editor" className="flex flex-col z-10 p-3 h-32 rounded-xl bg-white">
           <textarea
             id="inputText"
             ref={inputTextRef}
-            className="w-full h-24 p-3 rounded-t-xl focus:outline-none"
-            placeholder="请输入要润色的语段"
+            className="w-full h-min-24 focus:outline-none flex-grow verflow-y-scroll overflow-x-hidden scroll-mr-2"
+            placeholder="请输入您的问题或者聊天内容"
             value={input}
             onChange={handleChange}
+            style={{ resize: 'none' }}
           />
-        </div>
-
-        <div className="h-12 rounded-b-2xl p-2 flex text-sm items-center bg-white justify-between">
-          {stream ? (
-            <BinaryButton
-              className="border-white"
-              disabled={!isAborting}
-              active={isSending}
-              onMuteClick={handleClickMute}
-              onActiveClick={handleClickActive}
-            />
-          ) : (
-            <Button disabled={isSending}>
+          <div className="h-8 rounded-b-xl flex text-sm items-center bg-white justify-between">
+            <div className="flex"></div>
+            <Button disabled={isSending} onClick={handleClickMute}>
               <SendIcon />
             </Button>
-          )}
+          </div>
         </div>
-      </div>
-
-      <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow">
-        <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
-          <Button className="border-white" onClick={handleRead}>
-            <SpeakIcon className="border-white w-5 h-5" />
-          </Button>
-          <Button className="border-white" onClick={handleCopy}>
-            <CopyIcon className="border-white w-5 h-5" />
-          </Button>
-        </div>
-        <div className="p-1 flex-grow">{output}</div>
       </div>
     </div>
   )

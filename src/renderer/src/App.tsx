@@ -18,7 +18,7 @@ const initOpenAIApiKey = import.meta.env['RENDERER_VITE_OPENAI_API_KEY']
 
 const initOpenAIUrl = import.meta.env['RENDERER_VITE_OPENAI_API_PROXY']
   ? import.meta.env['RENDERER_VITE_OPENAI_API_PROXY']
-  : ''
+  : 'https://api.openai.com'
 
 export interface AppContextI {
   appMode: AppMode

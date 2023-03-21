@@ -183,6 +183,7 @@ app.whenReady().then(() => {
     mainWindow.setFocusable(true)
     mainWindow.setResizable(true)
     mainWindow.setContentSize(660, 420)
+    mainWindow.setMinimumSize(400, 340)
 
     if (fromSuspension) {
       try {
@@ -201,6 +202,7 @@ app.whenReady().then(() => {
   ipcMain.handle('suspension', (event) => {
     windowMode = WindowMode.suspension
 
+    mainWindow.setMinimumSize(30, 30)
     mainWindow.setFocusable(false)
     mainWindow.setResizable(false)
     mainWindow.setContentSize(31, 31)

@@ -44,6 +44,7 @@ import { githubLight, githubLightInit } from '@uiw/codemirror-theme-github'
 import { EditorView } from '@codemirror/view'
 import CodeLangSelect from '@renderer/components/commonComps/Select'
 import { LanguageSupport } from '@codemirror/language'
+import ReadButton from '@renderer/components/commonComps/ReadButton'
 // import transcribe from '@renderer/api/alicloud'
 
 enum CodeLang {
@@ -111,8 +112,10 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
 
   // state
   const [input, setInput] = useState<string>(`function hello(who = "world") {
-    console.log(\`Hello, \${who}!\`)
-  }`)
+  console.log(\`Hello, \${who}!\`)
+}
+
+`)
 
   const [model, setModel] = useState<ChatGPTModel>(ChatGPTModel.turbo_0301)
 
@@ -174,8 +177,12 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
   const codeExplain = useCallback(
     async (text: string): Promise<string> => {
       return codeExplainAPIRef.current.sendCodeExplainRequest(text, model).then((res) => {
-        console.log(res)
-        return res.data.choices[0].message.content
+        if (res instanceof Response) {
+          console.log(res)
+        } else {
+          console.log(res)
+          return res.data.choices[0].message.content
+        }
       })
     },
     [model, codeExplainAPIRef]
@@ -251,67 +258,63 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
   }, [input, autoCodeExplain])
 
   return (
-    <div id="panel-body" className="relative p-4 flex flex-col flex-grow w-full rounded-xl gap-2">
-      <div className="flex flex-col">
-        <div
-          className="w-full rounded-t-xl flex flex-col p-3 h-24 bg-white overflow-auto"
-          style={{ resize: 'vertical' }}
-        >
-          <CodeMirror
-            className="overflow-y-scroll overflow-x-hidden scroll-mr-2 min-h-min"
-            value={input}
-            onChange={handleChange}
-            placeholder="请输入要解释的代码片段"
-            indentWithTab
-            theme={githubLightInit({
-              settings: { caret: '#c6c6c6', fontFamily: 'monospace' }
-            })}
-            extensions={[
-              styleTheme,
-              codeLangExtensionMap[inputCodeLang]({ jsx: true }),
-              EditorView.lineWrapping
-            ]}
-          />
-        </div>
-
-        <div className="h-12 rounded-b-2xl p-2 flex text-sm items-center bg-white justify-between">
-          <div className="flex">
-            {/* <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
+    <div id="panel-body" className="relative flex-grow w-full rounded-xl">
+      <div className="absolute inset-0 p-4 flex flex-col gap-2">
+        <div className="flex flex-col h-1/2">
+          <div className="w-full rounded-xl flex flex-col p-3 h-full bg-white overflow-auto">
+            <CodeMirror
+              className="overflow-y-scroll overflow-x-hidden scroll-mr-2 min-h-min h-full"
+              value={input}
+              onChange={handleChange}
+              placeholder="请输入要解释的代码片段"
+              indentWithTab
+              theme={githubLightInit({
+                settings: { caret: '#c6c6c6', fontFamily: 'monospace' }
+              })}
+              extensions={[
+                styleTheme,
+                codeLangExtensionMap[inputCodeLang]({ jsx: true }),
+                EditorView.lineWrapping
+              ]}
+            />
+            <div className="h-8 rounded-b-xl flex text-sm items-center bg-white justify-between">
+              <div className="flex">
+                {/* <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
               <Detect languageMap={languageMap} />
             </div> */}
-            <CodeLangSelect
-              // open
-              value={inputCodeLang}
-              onValueChange={(val: CodeLang): void => setInputCodeLang(val)}
-              descMap={codeLangDescMap}
-            />
+                <CodeLangSelect
+                  // open
+                  value={inputCodeLang}
+                  onValueChange={(val: CodeLang): void => setInputCodeLang(val)}
+                  descMap={codeLangDescMap}
+                />
+              </div>
+              {stream ? (
+                <BinaryButton
+                  className="border-white"
+                  disabled={!isAborting}
+                  active={isSending}
+                  onMuteClick={handleClickMute}
+                  onActiveClick={handleClickActive}
+                />
+              ) : (
+                <Button disabled={isSending}>
+                  <SendIcon />
+                </Button>
+              )}
+            </div>
           </div>
-          {stream ? (
-            <BinaryButton
-              className="border-white"
-              disabled={!isAborting}
-              active={isSending}
-              onMuteClick={handleClickMute}
-              onActiveClick={handleClickActive}
-            />
-          ) : (
-            <Button disabled={isSending}>
-              <SendIcon />
-            </Button>
-          )}
         </div>
-      </div>
 
-      <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow">
-        <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
-          <Button className="border-white" onClick={handleRead}>
-            <SpeakIcon className="border-white w-5 h-5" />
-          </Button>
-          <Button className="border-white" onClick={handleCopy}>
-            <CopyIcon className="border-white w-5 h-5" />
-          </Button>
+        <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow h-1/2">
+          <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
+            <ReadButton text={output} />
+            <Button className="border-white" onClick={handleCopy}>
+              <CopyIcon className="border-white w-5 h-5" />
+            </Button>
+          </div>
+          <div className="p-1 flex-grow">{output}</div>
         </div>
-        <div className="p-1 flex-grow">{output}</div>
       </div>
     </div>
   )

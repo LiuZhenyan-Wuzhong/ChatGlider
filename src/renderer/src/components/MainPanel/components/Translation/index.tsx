@@ -21,6 +21,7 @@ import LanguageSelect from '../../../commonComps/Select'
 import TranslateAPI from '@renderer/api/openai/translateAPI'
 import BinaryButton from '@renderer/components/commonComps/BinaryButton'
 import { ChatGPTModel } from '@renderer/api/openai/openaiAPI'
+import ReadButton from '@renderer/components/commonComps/ReadButton'
 // import transcribe from '@renderer/api/alicloud'
 
 export enum Language {
@@ -169,19 +170,6 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
     [output]
   )
 
-  const handleRead: React.MouseEventHandler<HTMLButtonElement> = useCallback(
-    (e) => {
-      console.log('read')
-
-      // transcribe(output, _onReceiveBuffer)
-    },
-    [output]
-  )
-
-  const _onReceiveBuffer = useCallback((msg: Buffer): void => {
-    console.log(msg)
-  }, [])
-
   const handleAbort = useCallback(async () => {
     setIsAborting(true)
 
@@ -226,64 +214,67 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
   }, [autoTranslate, inputFromClipBoard])
 
   return (
-    <div id="panel-body" className="relative p-4 flex flex-col flex-grow w-full rounded-xl gap-2">
-      <div className="flex flex-col z-30">
-        <textarea
-          id="inputText"
-          ref={inputTextRef}
-          className="w-full h-24 p-3 rounded-t-xl focus:outline-none"
-          placeholder="请输入要翻译的语段"
-          value={input}
-          onChange={handleChange}
-        />
-        <div className="h-12 rounded-b-2xl p-2 flex text-sm items-center bg-white justify-between">
-          <div className="rounded-b-xl bg-white p-1 flex justify-evenly items-center gap-2">
-            <LanguageSelect
-              value={inputLanguage}
-              onValueChange={(val: Language): void => setInputLanguage(val)}
-              descMap={languageMap}
-            />
-            <Button className="border-white" onClick={handleSwitch}>
-              <SwitchIcon className="border-white w-5 h-5" />
-            </Button>
-            <LanguageSelect
-              // open
-              value={outputLanguage}
-              onValueChange={(val: Language): void => setOutputLanguage(val)}
-              descMap={languageMap}
-            />
-          </div>
-          <div className="flex">
-            {/* <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
+    <div id="panel-body" className="relative flex-grow w-full rounded-xl">
+      <div className="absolute inset-0 p-4 flex flex-col gap-2">
+        <div className="flex flex-col z-10 p-3 h-1/2 flex-grow rounded-xl bg-white">
+          <textarea
+            id="inputText"
+            ref={inputTextRef}
+            className="w-full h-min-24 focus:outline-none flex-grow verflow-y-scroll overflow-x-hidden scroll-mr-2"
+            placeholder="请输入要翻译的语段"
+            value={input}
+            onChange={handleChange}
+            style={{ resize: 'none' }}
+          />
+          <div className="h-8 rounded-b-xl flex text-sm items-center bg-white justify-between">
+            <div className="rounded-b-xl bg-white flex justify-evenly items-center gap-2">
+              <LanguageSelect
+                value={inputLanguage}
+                onValueChange={(val: Language): void => setInputLanguage(val)}
+                descMap={languageMap}
+              />
+              <Button className="border-white" onClick={handleSwitch}>
+                <SwitchIcon className="border-white w-5 h-5" />
+              </Button>
+              <LanguageSelect
+                // open
+                value={outputLanguage}
+                onValueChange={(val: Language): void => setOutputLanguage(val)}
+                descMap={languageMap}
+              />
+            </div>
+            <div className="flex">
+              {/* <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
               <Detect languageMap={languageMap} input={input}/>
             </div> */}
+            </div>
+            {stream ? (
+              <BinaryButton
+                className="border-white"
+                disabled={isAborting}
+                active={isSending}
+                onMuteClick={handleClickMute}
+                onActiveClick={handleClickActive}
+              />
+            ) : (
+              <Button disabled={isSending} onClick={handleClickMute}>
+                <SendIcon />
+              </Button>
+            )}
           </div>
-          {stream ? (
-            <BinaryButton
-              className="border-white"
-              disabled={isAborting}
-              active={isSending}
-              onMuteClick={handleClickMute}
-              onActiveClick={handleClickActive}
-            />
-          ) : (
-            <Button disabled={isSending}>
-              <SendIcon />
-            </Button>
-          )}
         </div>
-      </div>
 
-      <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow z-30">
-        <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
-          <Button className="border-white" onClick={handleRead}>
-            <SpeakIcon className="border-white w-5 h-5" />
-          </Button>
-          <Button className="border-white" onClick={handleCopy}>
-            <CopyIcon className="border-white w-5 h-5" />
-          </Button>
+        <div className="w-full rounded-xl bg-white p-2 flex flex-col h-1/2 flex-grow z-10">
+          <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
+            {/* <ReadButton text={output} /> */}
+            <Button className="border-white" onClick={handleCopy}>
+              <CopyIcon className="border-white w-5 h-5" />
+            </Button>
+          </div>
+          <div className="p-1 flex-grow overflow-y-scroll">
+            <div className="h-full">{output}</div>
+          </div>
         </div>
-        <div className="p-1 flex-grow">{output}</div>
       </div>
     </div>
   )

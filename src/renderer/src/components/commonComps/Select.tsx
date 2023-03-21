@@ -79,7 +79,7 @@ export default function Select({
           side="bottom"
           className={clsx(
             'p-2 overflow-hidden bg-white rounded-lg shadow-lg border',
-            'transition ease-in-out duration-300'
+            'transition ease-in-out duration-300 z-30'
           )}
         >
           {/* <SelectUI.ScrollUpButton className="rotate-180 flex items-center justify-center bg-white text-violet11 cursor-default">
