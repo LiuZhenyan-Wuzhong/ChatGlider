@@ -1,5 +1,11 @@
 // import axios, { AxiosResponse, ResponseType } from 'axios';
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, GenericAbortSignal } from 'axios'
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  AxiosRequestConfig,
+  AxiosResponse,
+  GenericAbortSignal
+} from 'axios'
 import { createParser } from 'eventsource-parser'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -27,13 +33,17 @@ export type OpenAIReqBody = {
 }
 
 export default class OpenAIAPI {
-  static axiosSSE = async (
+  static fetchSSE = async (
     url: string,
     data: object,
-    config: AxiosRequestConfig,
+    config: {
+      method: string
+      headers: Partial<AxiosHeaders> // web todo
+    },
+    signal: AbortSignal,
     onMessage: (data: string) => void
   ): Promise<AxiosResponse> => {
-    config.responseType = 'stream'
+    const { method, headers } = config
 
     const res = await axios
       .post(url, data, config)
@@ -60,6 +70,8 @@ export default class OpenAIAPI {
         onMessage(event.data)
       }
     })
+
+    console.log(res.data)
 
     res.data.on('readable', () => {
       let chunk
@@ -90,19 +102,19 @@ export default class OpenAIAPI {
   sendStreamRequest = (
     absoluteUrl: string,
     data: object,
-    config: AxiosRequestConfig,
+    config: { headers: Partial<AxiosHeaders> },
     onMessage: (data: string) => void
   ): Promise<AxiosResponse> => {
     // const fetchUrl = config.baseURL + url
 
-    return OpenAIAPI.axiosSSE(
+    return OpenAIAPI.fetchSSE(
       absoluteUrl,
       data,
       {
-        headers: config.headers,
         method: 'POST',
-        signal: this.chatAbortController.signal // web todo
+        headers: config.headers
       },
+      this.chatAbortController.signal, // web todo
       onMessage
     )
   }
@@ -190,5 +202,9 @@ export abstract class APIHandlerBase {
     } else {
       return axios.post(absoluteUrl, data, config)
     }
+  }
+
+  abort(): void {
+    this.openaiAPI.chatAbortController.abort()
   }
 }

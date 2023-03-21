@@ -21,19 +21,25 @@ import { ReactComponent as CrossIcon } from '@renderer/assets/img/cross.svg'
 import { ReactComponent as OpenAIIcon } from '@renderer/assets/img/openai.svg'
 import { ReactComponent as PolishIcon } from '@renderer/assets/img/polish.svg'
 import { ReactComponent as ChatIcon } from '@renderer/assets/img/chat.svg'
-import { ReactComponent as SummaryIcon } from '@renderer/assets/img/summary.svg'
 import { ReactComponent as TerminalIcon } from '@renderer/assets/img/terminal_line.svg'
 import { ReactComponent as TranslationIcon } from '@renderer/assets/img/translation.svg'
+import { ReactComponent as DownIcon } from '@renderer/assets/img/down.svg'
+import { ReactComponent as UpIcon } from '@renderer/assets/img/up.svg'
+import { ReactComponent as ContactIcon } from '@renderer/assets/img/contact.svg'
 import * as Tabs from '@radix-ui/react-tabs'
 import Toggle from '../commonComps/Toggle'
 import Settings from './components/Settings'
 import Button from '../commonComps/Button'
 import OpenAIAPI from '@renderer/api/openai/openaiAPI'
+import CodeExplain from './components/CodeExplain'
+import Polish from './components/Polish'
 
 export interface MainPanelContextI {
-  input: string
-  setInput: Dispatch<SetStateAction<string>>
+  mainInput: string
+  setMainInput: Dispatch<SetStateAction<string>>
   inputFromClipBoard: React.MutableRefObject<boolean>
+  stream: boolean
+  setStream: Dispatch<SetStateAction<boolean>>
 }
 
 export const MainPanelContext = createContext<MainPanelContextI | null>(null)
@@ -61,14 +67,16 @@ interface MainPanelProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   // context
-  const { setAppMode, apiKey, setApiKey } = useContext(AppContext as Context<AppContextI>)
+  const { appMode, setAppMode, apiKey, setApiKey } = useContext(AppContext as Context<AppContextI>)
 
   // state
-  const [input, setInput] = useState<string>('')
+  const [mainInput, setMainInput] = useState<string>('')
 
   const [appUsage, setAppUsage] = useState<AppUsage>(AppUsage.translation)
 
   const [isPin, setIsPin] = useState<boolean>(false)
+
+  const [stream, setStream] = useState(true)
 
   // ref
   const mainPanelRef = useRef<HTMLDivElement>(null)
@@ -97,6 +105,16 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
     setAppMode(AppMode.suspension)
   }
 
+  const handleToBigger: MouseEventHandler<HTMLButtonElement> = (e) => {
+    window.electron.ipcRenderer.invoke('bigger')
+    setAppMode(AppMode.bigger)
+  }
+
+  const handleToExpand: MouseEventHandler<HTMLButtonElement> = (e) => {
+    window.electron.ipcRenderer.invoke('expand', false)
+    setAppMode(AppMode.expand)
+  }
+
   // effect
   useEffect(() => {
     // auto focus
@@ -109,7 +127,7 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
     window.electron.ipcRenderer.on('sendCopiedText', (e, text) => {
       inputFromClipBoard.current = true
 
-      setInput(text)
+      setMainInput(text)
     })
     window.electron.ipcRenderer.on('suspension', (e) => {
       setAppMode(AppMode.suspension)
@@ -128,63 +146,81 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
       tabIndex={0}
       onBlur={handleBlur}
     >
-      <div className="w-full h-full relative flex flex-col text-gray-900 flex-grow">
-        <Tabs.Root
-          value={appUsage}
-          onValueChange={handleTabChange}
-          className="flex flex-col flex-grow"
-        >
-          <div id="panel-header" className="drag-area relative w-full h-12 bg-gray-100 shrink-0">
-            <div className="absolute inset-0 z-0 px-4 pt-4 flex items-center justify-between">
-              <div className="w-40 flex justify-start items-center">
-                <Tabs.List className="flex gap-1 p-1 bg-white rounded-lg">
-                  {appUsageDescList.map(({ name, value, icon }, idx) => (
-                    <Tabs.Trigger
-                      key={idx}
-                      value={value}
-                      className={clsx(
-                        'w-8 h-6 py-1 px-2 flex items-center justify-center rounded-md',
-                        'data-[state=active]:bg-gray-200',
-                        'hover:bg-gray-300',
-                        'transition ease-in-out duration-200'
-                      )}
-                    >
-                      {icon}
-                    </Tabs.Trigger>
-                  ))}
-                </Tabs.List>
-              </div>
+      <MainPanelContext.Provider
+        value={{ mainInput, setMainInput, inputFromClipBoard, stream, setStream }}
+      >
+        <div className="w-full h-full relative flex flex-col text-gray-900 flex-grow">
+          <Tabs.Root
+            value={appUsage}
+            onValueChange={handleTabChange}
+            className="flex flex-col flex-grow"
+          >
+            <div id="panel-header" className="drag-area relative w-full h-12 bg-gray-100 shrink-0">
+              <div className="absolute inset-0 z-0 px-4 pt-4 flex items-center justify-between">
+                <div className="w-40 flex justify-start items-center">
+                  <Tabs.List className="flex gap-1 p-1 bg-white rounded-lg">
+                    {appUsageDescList.map(({ name, value, icon }, idx) => (
+                      <Tabs.Trigger
+                        key={idx}
+                        value={value}
+                        className={clsx(
+                          'w-8 h-6 py-1 px-2 flex items-center justify-center rounded-md',
+                          'data-[state=active]:bg-gray-200',
+                          'hover:bg-gray-300',
+                          'transition ease-in-out duration-200'
+                        )}
+                      >
+                        {icon}
+                      </Tabs.Trigger>
+                    ))}
+                  </Tabs.List>
+                </div>
 
-              <div className="w-8 h-8 flex items-center justify-center">
-                <OpenAIIcon />
-              </div>
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <OpenAIIcon />
+                </div>
 
-              <div className="flex w-40 items-center justify-end gap-2">
-                <Settings />
-                <Toggle
-                  className={clsx('text-gray-600', isPin ? 'bg-gray-200 border-gray-300' : '')}
-                  pressed={isPin}
-                  onPressedChange={handlePressPin}
-                >
-                  <PinIcon />
-                </Toggle>
-                <Button onClick={handleClose}>
-                  <CrossIcon />
-                </Button>
+                <div className="flex w-40 items-center justify-end gap-2">
+                  {appMode === AppMode.bigger && (
+                    <Button onClick={handleToExpand}>
+                      <UpIcon />
+                    </Button>
+                  )}
+
+                  {appMode === AppMode.expand && (
+                    <Button onClick={handleToBigger}>
+                      <DownIcon />
+                    </Button>
+                  )}
+
+                  <Settings />
+                  <Toggle
+                    className={clsx('text-gray-600', isPin ? 'bg-gray-200 border-gray-300' : '')}
+                    pressed={isPin}
+                    onPressedChange={handlePressPin}
+                  >
+                    <PinIcon />
+                  </Toggle>
+                  <Button onClick={handleClose}>
+                    <CrossIcon />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <MainPanelContext.Provider value={{ input, setInput, inputFromClipBoard }}>
             <Tabs.Content value={AppUsage.translation} asChild>
               <Translation />
             </Tabs.Content>
             <Tabs.Content value={AppUsage.chat}> </Tabs.Content>
-            <Tabs.Content value={AppUsage.codeExplain}> </Tabs.Content>
-            <Tabs.Content value={AppUsage.polishing}> </Tabs.Content>
-          </MainPanelContext.Provider>
-        </Tabs.Root>
-      </div>
+            <Tabs.Content value={AppUsage.codeExplain} asChild>
+              <CodeExplain />
+            </Tabs.Content>
+            <Tabs.Content value={AppUsage.polishing} asChild>
+              <Polish />
+            </Tabs.Content>
+          </Tabs.Root>
+        </div>
+      </MainPanelContext.Provider>
     </div>
   )
 }

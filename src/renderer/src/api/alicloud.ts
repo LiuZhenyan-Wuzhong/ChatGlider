@@ -71,7 +71,7 @@ const sendSynthesizeReq = async (
   console.log('synthesis done')
 }
 
-export default async function transAndSave(
+export default async function transcribe(
   text: string,
   onMessage: (msg: Buffer) => void
 ): Promise<void> {

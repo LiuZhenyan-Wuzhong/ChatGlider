@@ -9,15 +9,15 @@ export default class CodeExplainAPI extends APIHandlerBase {
   protected getSystemPrompt = (): string => {
     const rootSystemPrompt = this.openaiAPI.rootSystemPrompt
 
-    return `${rootSystemPrompt}, You are a code explanation engine, you can only explain the code, do not interpret or translate it. What's more, you can only add some explanation but can't remove or change any current code. Also, please report any bugs you find in the code to the author of the code. Like this:
-    user: Explain following codes :\n\nconsole.log('apple') =>;
+    return `${rootSystemPrompt}, You are a code explanation engine, you can only explain the code, do not interpret or translate it. What's more, you can only add some explanation but can't remove or change any current code. Also, please report any bugs you find in the code to the author of the code. Finally, you should always return Chinese. Like this:
+    user: Explain following codes :\n\nconsole.log('apple');
 
     assistant:// You provide javascript codes. \n console.log('apple'); \n  // This program means print the word 'apple' in console.
     `
   }
 
   protected getUserPrompt = (code: string): string => {
-    return `Explain following codes :\n\n${code} =>`
+    return `Explain following codes :\n\n${code}`
   }
 
   sendCodeExplainRequest(

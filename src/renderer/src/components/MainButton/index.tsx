@@ -11,7 +11,7 @@ export default function MainButton({ className }: MainButtonProps): JSX.Element 
   const { setAppMode } = useContext(AppContext as Context<AppContextI>)
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    window.electron.ipcRenderer.invoke('expand')
+    window.electron.ipcRenderer.invoke('expand', true)
     setAppMode(AppMode.expand)
   }
 

@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
-import OpenAIAPI, { APIHandlerBase, ChatGPTModel, OpenAIReqBody } from './openaiAPI'
+import OpenAIAPI, { APIHandlerBase, ChatGPTModel } from './openaiAPI'
 
-export default class TranslateAPI extends APIHandlerBase {
+export default class PolishAPI extends APIHandlerBase {
   constructor(openaiAPI: OpenAIAPI) {
     super(openaiAPI)
   }
@@ -9,22 +9,16 @@ export default class TranslateAPI extends APIHandlerBase {
   protected getSystemPrompt = (): string => {
     const rootSystemPrompt = this.openaiAPI.rootSystemPrompt
 
-    return `${rootSystemPrompt}, You are a translation engine that can only translate text and cannot interpret it.`
+    return `${rootSystemPrompt}, You are a linguistic master and literary figure. I will provide you with a text that needs to be polished and optimized to make it of higher quality. Please keep the original language and do not provide any explanations other than that.`
   }
 
-  protected getUserPrompt = (
-    text: string,
-    inputLanguage: string,
-    outputLanguage: string
-  ): string => {
-    return `translate from ${inputLanguage} to ${outputLanguage}:\n\n${text} =>`
+  protected getUserPrompt = (code: string): string => {
+    return `Polish following sentences :\n\n${code}`
   }
 
-  sendTranslateRequest(
-    text: string,
+  sendPolishRequest(
+    code: string,
     model: ChatGPTModel,
-    inputLanguage: string,
-    outputLanguage: string,
     stream?: boolean,
     onMessage?: (text: string) => void
   ): Promise<AxiosResponse> {
@@ -39,7 +33,7 @@ export default class TranslateAPI extends APIHandlerBase {
       content: this.getSystemPrompt()
     })
 
-    const userPrompt = this.getUserPrompt(text, inputLanguage, outputLanguage)
+    const userPrompt = this.getUserPrompt(code)
 
     data.messages.push({ role: 'user', content: userPrompt })
 

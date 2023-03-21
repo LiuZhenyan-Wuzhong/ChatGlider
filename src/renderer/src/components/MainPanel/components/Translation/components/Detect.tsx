@@ -1,4 +1,4 @@
-import { sendDetectReq } from '@renderer/api/detect'
+import { sendDetectReq } from '@renderer/api/google/detect'
 import { AllHTMLAttributes, Context, useCallback, useContext, useEffect, useState } from 'react'
 import { MainPanelContext, MainPanelContextI } from '../../..'
 import { Language, languageDesc } from '..'
@@ -6,12 +6,10 @@ import { Language, languageDesc } from '..'
 const googleApiKey = ''
 interface DetectProps extends AllHTMLAttributes<HTMLDivElement> {
   languageMap: { [key: string]: languageDesc }
+  input: string
 }
 
-export default function Detect({ className, languageMap }: DetectProps): JSX.Element {
-  // context
-  const { input, setInput } = useContext(MainPanelContext as Context<MainPanelContextI>)
-
+export default function Detect({ className, languageMap, input }: DetectProps): JSX.Element {
   // state
   const [detectLanguage, setDetectLanguage] = useState<Language | null>(null)
 

@@ -13,7 +13,10 @@ import { ReactComponent as SettingIcon } from '@renderer/assets/img/setting.svg'
 import Button from '@renderer/components/commonComps/Button'
 import { clsx } from 'clsx'
 import { AppContext, AppContextI } from '@renderer/App'
-import { MainPanelContext } from '../..'
+import { MainPanelContext, MainPanelContextI } from '../..'
+import Switch from '@renderer/components/commonComps/Switch'
+import Tooltip from '@renderer/components/commonComps/Tooltip'
+import Info from '@renderer/components/commonComps/Info'
 
 enum SettingType {
   input = 'SettingType/input',
@@ -25,6 +28,7 @@ interface SettingItemProps extends AllHTMLAttributes<HTMLDivElement> {
   settingName: string
   settingElement: ReactNode
   placeholder: string
+  description: string
   value: string
   onChangeInput: (val: string) => void
 }
@@ -35,6 +39,7 @@ function SettingItem({
   settingName,
   settingElement,
   placeholder,
+  description,
   value,
   onChangeInput
 }: SettingItemProps): JSX.Element {
@@ -48,10 +53,19 @@ function SettingItem({
   }
 
   return (
-    <fieldset className={clsx('flex flex-col gap-2 items-start', className)}>
-      <label className="flex items-center text-sm font-medium cursor-pointer" htmlFor={settingName}>
-        {settingElement}
-      </label>
+    <fieldset className={clsx('flex flex-col gap-1 items-start', className)}>
+      <div className="flex items-center gap-2">
+        <label
+          className="flex items-center text-sm font-medium cursor-pointer"
+          htmlFor={settingName}
+        >
+          {settingElement}
+        </label>
+        <Tooltip content={description}>
+          <Info />
+        </Tooltip>
+      </div>
+
       {settingType === SettingType.input ? (
         <input
           value={value}
@@ -69,7 +83,7 @@ function SettingItem({
         <textarea
           value={value}
           className={clsx(
-            'w-full flex items-center justify-center h-16 rounded py-1 px-2.5 text-xs bg-white border',
+            'w-full flex items-center justify-center leading-sm rounded py-1 px-2.5 text-xs bg-white border',
             'text-gray-700',
             'focus:bg-white focus:shadow-sm focus:shadow-opacity-50 focus:outline-none'
           )}
@@ -90,6 +104,8 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
   const { apiKey, setApiKey, OpenAI_URL, setOpenAI_URL, openAIAPIRef } = useContext(
     AppContext as Context<AppContextI>
   )
+
+  const { stream, setStream } = useContext(MainPanelContext as Context<MainPanelContextI>)
 
   // state
   const [open, setOpen] = useState(false)
@@ -114,8 +130,9 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
         >
           <SettingIcon />
           <div
+            id="cartain"
             className={clsx(
-              'fixed z-30 inset-0 bg-gray-500 bg-opacity-25 cursor-default rounded-2xl',
+              'fixed z-50 inset-0 bg-gray-500 bg-opacity-25 cursor-default rounded-2xl',
               open ? '' : 'hidden'
             )}
           ></div>
@@ -124,7 +141,7 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
       <Popover.Portal>
         <Popover.Content
           side="bottom"
-          className="z-40 w-96 h-full rounded-xl p-4 bg-white flex flex-col gap-2"
+          className="z-40 w-[400px] h-full rounded-xl p-4 bg-white flex flex-col gap-2 border shadow-sm"
         >
           <Popover.Close
             className={clsx(
@@ -148,6 +165,7 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
               settingName="OpenAI-ApiKey"
               settingElement={'OpenAI-ApiKey'}
               placeholder="Your OpenAI ApiKey."
+              description="请设置您的OpenAI APIKey，作者承诺将不会保存和使用您的任何数据。"
               value={apiKey}
               onChangeInput={(val): void => setApiKey(val)}
             />
@@ -156,10 +174,29 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
               settingType={SettingType.textarea}
               settingName="OpenAI-URL"
               settingElement={'OpenAI-URL'}
-              placeholder="Your OpenAI ApiKey."
+              placeholder="Your OpenAI URL."
+              description="如果您拥有可以帮您转发请求的url，请设置您的OpenAI URL，此处设置的是openai的默认api url。"
               value={OpenAI_URL}
               onChangeInput={(val): void => setOpenAI_URL(val)}
             />
+            <div className="flex gap-4 items-center">
+              <div className="flex items-center gap-2">
+                <label className="text-[15px] leading-none" htmlFor="check-if-stream">
+                  开启流式传输
+                </label>
+                <Tooltip content="像ChatGPT原版应用中一样的逐步将内容显示出来">
+                  <Info />
+                </Tooltip>
+              </div>
+
+              <Switch
+                id="check-if-stream"
+                checked={stream}
+                onCheckedChange={(e): void => {
+                  setStream((prev) => !prev)
+                }}
+              />
+            </div>
           </div>
 
           <Popover.Arrow className="fill-white" />

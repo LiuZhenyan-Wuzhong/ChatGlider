@@ -1,13 +1,14 @@
-import { app, shell, BrowserWindow, screen, ipcMain, Tray, Menu, session } from 'electron'
+import { app, shell, BrowserWindow, screen, ipcMain, Tray, Menu, clipboard } from 'electron'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import copySelectedText from './copySelectedText'
 import { MouseDragHandler } from './handler'
 
-enum WindowState {
-  expand = 'WindowState/expand',
-  hover = 'WindowState/hover',
-  suspension = 'WindowState/suspension'
+enum WindowMode {
+  expand = 'WindowMode/expand',
+  hover = 'WindowMode/hover',
+  suspension = 'WindowMode/suspension',
+  bigger = 'WindowMode/bigger'
 }
 
 function createWindow(): BrowserWindow {
@@ -65,11 +66,13 @@ app.whenReady().then(() => {
   // window
   const mainWindow = createWindow()
 
+  // mainWindow.on('rezise')
+
   // tray
   const tray = new Tray(path.join(__dirname, '../../public/img/WuBlogLogo.png'))
 
   // var
-  let state: WindowState = WindowState.suspension
+  let windowMode: WindowMode = WindowMode.suspension
   let pin = false
 
   // contextmenu
@@ -78,7 +81,7 @@ app.whenReady().then(() => {
       label: '打开',
       click: (): void => {
         mainWindow.show()
-        mainWindow.webContents.send('expand')
+        mainWindow.webContents.send('expand', false)
       }
     },
     {
@@ -119,7 +122,7 @@ app.whenReady().then(() => {
     if (isPositionOnWindow(x, y, mainWindow)) return
 
     // re-locate
-    if (state === WindowState.suspension) {
+    if (windowMode === WindowMode.suspension) {
       mainWindow.setPosition(x + 10, y + 10)
 
       mainWindow.show()
@@ -144,7 +147,7 @@ app.whenReady().then(() => {
 
     if (isPositionOnWindow(x, y, mainWindow)) return
 
-    if (state === WindowState.expand) {
+    if (windowMode === WindowMode.expand) {
       if (pin) {
         return
       } else {
@@ -154,7 +157,7 @@ app.whenReady().then(() => {
         mainWindow.setResizable(false)
         mainWindow.setContentSize(31, 31)
 
-        state = WindowState.suspension
+        windowMode = WindowMode.suspension
 
         mainWindow.webContents.send('suspension')
       }
@@ -163,23 +166,40 @@ app.whenReady().then(() => {
     }
   }
 
-  ipcMain.handle('expand', async (event) => {
-    state = WindowState.expand
+  ipcMain.handle('bigger', async (event) => {
+    windowMode = WindowMode.bigger
 
     mainWindow.setFocusable(true)
     mainWindow.setResizable(true)
-    mainWindow.setContentSize(660, 380)
 
-    try {
-      const text = await copySelectedText()
-      mainWindow.webContents.send('sendCopiedText', text)
-    } catch (err) {
-      console.log(err)
+    const [width, height] = mainWindow.getContentSize()
+
+    mainWindow.setContentSize(width, height + 400 > 820 ? 820 : height + 400)
+  })
+
+  ipcMain.handle('expand', async (event, fromSuspension: boolean) => {
+    windowMode = WindowMode.expand
+
+    mainWindow.setFocusable(true)
+    mainWindow.setResizable(true)
+    mainWindow.setContentSize(660, 420)
+
+    if (fromSuspension) {
+      try {
+        const text = await copySelectedText()
+        mainWindow.webContents.send('sendCopiedText', text)
+      } catch (err) {
+        console.log(err)
+      }
+    } else {
+      const [width] = mainWindow.getContentSize()
+
+      mainWindow.setContentSize(width, 420)
     }
   })
 
   ipcMain.handle('suspension', (event) => {
-    state = WindowState.suspension
+    windowMode = WindowMode.suspension
 
     mainWindow.setFocusable(false)
     mainWindow.setResizable(false)
@@ -195,6 +215,10 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('sendTranslateReq', (event) => {})
+
+  ipcMain.handle('copy', (event, text) => {
+    clipboard.writeText(text)
+  })
 })
 
 app.on('window-all-closed', () => {
