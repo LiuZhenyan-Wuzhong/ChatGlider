@@ -4,3 +4,4 @@ out
 *.log*
 proxy
 .env.*.local
+.env.local
