@@ -101,9 +101,9 @@
       "requestedExecutionLevel":"requireAdministrator",
       "publish": {
         "provider": "github",
-        "owner": "LiuZhenyan-Wuzhong",
-        "repo": "git@github.com:LiuZhenyan-Wuzhong/ChatGlider.git",
-        "token": "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"
+        "owner": "${env.GITHUB_API_OWNER}",
+        "repo": "${env.GITHUB_API_REPO}",
+        "token": "${env.GITHUB_API_TOKEN}"
       }
     },
     "mac":{
