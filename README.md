@@ -11,10 +11,10 @@
 
 一个通过electron构建的桌面端划词翻译软件，提供方便快捷的全局翻译服务。同时实现了对话、代码分析、文章润色等功能。Powered by ChatGPT API
 
+![ChatGlider-usage](https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/video1.0.0.gif)
+
 ## Quick Start
 将本项目的releases文件1.0（目前只支持win，mac以及linux版本正在路上）下载到本地，常规的安装流程，需要开启管理员权限以体验全部功能。
-
-<img alt="ChatGlider-usage" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/video1.0.0.gif">
 
 本项目特色：
 - 全局划词翻译，监听到划词时按钮弹出，轻松快捷
