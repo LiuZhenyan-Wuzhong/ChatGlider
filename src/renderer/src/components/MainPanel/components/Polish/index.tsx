@@ -56,7 +56,9 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
   // context
   const { openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
 
-  const { inputFromClipBoard, stream } = useContext(MainPanelContext as Context<MainPanelContextI>)
+  const { inputFromClipBoard, stream, mainInput } = useContext(
+    MainPanelContext as Context<MainPanelContextI>
+  )
 
   // state
   const [input, setInput] = useState<string>('')
@@ -64,8 +66,6 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
   const [model, setModel] = useState<ChatGPTModel>(ChatGPTModel.turbo_0301)
 
   const [output, setOutput] = useState<string>('')
-
-  const [autoPolish, setAutoPolish] = useState<boolean>(false)
 
   const [isAborting, setIsAborting] = useState<boolean>(false)
 
@@ -193,11 +193,17 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
 
   // effect
   useEffect(() => {
-    if (autoPolish || inputFromClipBoard.current) {
+    if (inputFromClipBoard.current) {
+      inputFromClipBoard.current = false
       handlePolish()
     }
-    inputFromClipBoard.current = false
-  }, [autoPolish, inputFromClipBoard])
+  }, [input])
+
+  useEffect(() => {
+    if (inputFromClipBoard.current && mainInput.length > 0) {
+      setInput(mainInput)
+    }
+  }, [mainInput, inputFromClipBoard])
 
   return (
     <div id="panel-body" className="relative flex-grow w-full rounded-xl">

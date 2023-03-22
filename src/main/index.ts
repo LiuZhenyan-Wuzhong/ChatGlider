@@ -1,4 +1,6 @@
 import { app, shell, BrowserWindow, screen, ipcMain, Tray, Menu, clipboard } from 'electron'
+import fs from 'fs'
+import fsPromises from 'fs/promises'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import copySelectedText from './copySelectedText'
@@ -9,6 +11,43 @@ enum WindowMode {
   hover = 'WindowMode/hover',
   suspension = 'WindowMode/suspension',
   bigger = 'WindowMode/bigger'
+}
+
+const storagePath = path.join(app.getPath('userData'), 'storage.json')
+
+interface UsetStorage {
+  openAIAPIKey?: string
+  openAIURL?: string
+  stream?: boolean
+}
+
+// read
+async function loadStorage(): Promise<UsetStorage> {
+  try {
+    const data = await fsPromises.readFile(storagePath, { encoding: 'utf-8', flag: 'r' })
+
+    if (data.length === 0) {
+      return {}
+    }
+    return JSON.parse(data)
+  } catch (err) {
+    console.error(err)
+
+    await fsPromises.writeFile(storagePath, '')
+
+    console.log('创建了用户数据目录。')
+
+    return {}
+  }
+}
+
+// save
+async function saveStorage(data: UsetStorage): Promise<void> {
+  try {
+    await fsPromises.writeFile(storagePath, JSON.stringify(data))
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 function createWindow(): BrowserWindow {
@@ -29,6 +68,7 @@ function createWindow(): BrowserWindow {
     focusable: false,
     transparent: true,
     autoHideMenuBar: true,
+    icon: path.resolve(__dirname, '../../public/img/favicon.ico'),
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, '../preload/index.js')
@@ -69,7 +109,7 @@ app.whenReady().then(() => {
   // mainWindow.on('rezise')
 
   // tray
-  const tray = new Tray(path.join(__dirname, '../../public/img/WuBlogLogo.png'))
+  const tray = new Tray(path.join(__dirname, '../../public/img/favicon.ico'))
 
   // var
   let windowMode: WindowMode = WindowMode.suspension
@@ -112,6 +152,10 @@ app.whenReady().then(() => {
     const handler = new MouseDragHandler(mouseDownUserCallback, mouseUpUserCallback)
 
     handler.listen()
+  })
+
+  loadStorage().then((storage) => {
+    mainWindow.webContents.send('loadUserData', storage)
   })
 
   const mouseUpUserCallback = async (): Promise<void> => {
@@ -220,6 +264,21 @@ app.whenReady().then(() => {
 
   ipcMain.handle('copy', (event, text) => {
     clipboard.writeText(text)
+  })
+
+  ipcMain.handle('saveUserData', async (event, userData) => {
+    const storage = await loadStorage()
+    const { openAIAPIKey, openAIURL, stream } = userData
+
+    storage.openAIAPIKey = openAIAPIKey
+    storage.openAIURL = openAIURL
+    storage.stream = stream
+
+    await saveStorage(storage)
+  })
+
+  ipcMain.handle('openBrowser', async (event, url) => {
+    shell.openExternal(url)
   })
 })
 

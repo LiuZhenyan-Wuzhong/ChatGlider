@@ -109,7 +109,9 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
   // context
   const { openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
 
-  const { inputFromClipBoard, stream } = useContext(MainPanelContext as Context<MainPanelContextI>)
+  const { inputFromClipBoard, stream, mainInput } = useContext(
+    MainPanelContext as Context<MainPanelContextI>
+  )
 
   // state
   const [input, setInput] = useState<string>(`function hello(who = "world") {
@@ -263,12 +265,17 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
 
   // effect
   useEffect(() => {
-    if (autoCodeExplain || inputFromClipBoard.current) {
-      handleCodeExplain()
-
+    if (inputFromClipBoard.current) {
       inputFromClipBoard.current = false
+      handleCodeExplain()
     }
-  }, [input, autoCodeExplain])
+  }, [input])
+
+  useEffect(() => {
+    if (inputFromClipBoard.current && mainInput.length > 0) {
+      setInput(mainInput)
+    }
+  }, [mainInput, inputFromClipBoard])
 
   return (
     <div id="panel-body" className="relative flex-grow w-full rounded-xl">

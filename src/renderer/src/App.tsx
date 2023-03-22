@@ -23,10 +23,10 @@ const initOpenAIUrl = import.meta.env['RENDERER_VITE_OPENAI_API_PROXY']
 export interface AppContextI {
   appMode: AppMode
   setAppMode: Dispatch<SetStateAction<AppMode>>
-  apiKey: string
-  setApiKey: Dispatch<SetStateAction<string>>
-  OpenAI_URL: string
-  setOpenAI_URL: Dispatch<SetStateAction<string>>
+  openAIAPIKey: string
+  setOpenAIAPIKey: Dispatch<SetStateAction<string>>
+  openAIURL: string
+  setOpenAIURL: Dispatch<SetStateAction<string>>
   openAIAPIRef: MutableRefObject<OpenAIAPI>
 }
 
@@ -45,18 +45,18 @@ export default function App({ className }: AppProps): JSX.Element {
   // state
   const [appMode, setAppMode] = useState<AppMode>(AppMode.suspension)
 
-  const [apiKey, setApiKey] = useState<string>(initOpenAIApiKey)
+  const [openAIAPIKey, setOpenAIAPIKey] = useState<string>(initOpenAIApiKey)
 
-  const [OpenAI_URL, setOpenAI_URL] = useState<string>(initOpenAIUrl)
+  const [openAIURL, setOpenAIURL] = useState<string>(initOpenAIUrl)
 
   // effect
   useEffect(() => {
-    openAIAPIRef.current.apiKey = apiKey
-  }, [apiKey])
+    openAIAPIRef.current.openAIAPIKey = openAIAPIKey
+  }, [openAIAPIKey])
 
   useEffect(() => {
-    openAIAPIRef.current.openaiURL = OpenAI_URL
-  }, [OpenAI_URL])
+    openAIAPIRef.current.openaiURL = openAIURL
+  }, [openAIURL])
 
   // ref
   const openAIAPIRef = useRef(new OpenAIAPI())
@@ -66,10 +66,10 @@ export default function App({ className }: AppProps): JSX.Element {
       value={{
         appMode,
         setAppMode,
-        apiKey,
-        setApiKey,
-        OpenAI_URL,
-        setOpenAI_URL,
+        openAIAPIKey,
+        setOpenAIAPIKey,
+        openAIURL,
+        setOpenAIURL,
         openAIAPIRef
       }}
     >

@@ -3845,10 +3845,10 @@ invariant@^2.2.4:
   dependencies:
     loose-envify "^1.0.0"
 
-iohook-forglider@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/iohook-forglider/-/iohook-forglider-1.0.1.tgz#ed856d9c9454d80071476b3bbb7aa29deb8f2e57"
-  integrity sha512-iqOug0Ly1oYorZnWvKK+BxGy1ilTc28mAigOG5D/qy8BGHyM3jSscq695U81QTkZbYnwiz1t1qpHNprrmk3pDQ==
+iohook@^0.9.3:
+  version "0.9.3"
+  resolved "https://registry.npmjs.org/iohook/-/iohook-0.9.3.tgz#3beae68daeac09bad3a7fde290f595ac7172b6e7"
+  integrity sha512-O6xHAyRfJvVUYu87sZH5CgBPLo/f70NaZSIbm3o6U4L/I9PdntfjlNYrJ7hbv5nPUwfE3k5TGDH1R1bFVdDBZg==
   dependencies:
     nugget "^2.0.1"
     pump "^1.0.3"

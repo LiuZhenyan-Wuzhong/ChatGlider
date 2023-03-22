@@ -5,18 +5,19 @@ import {
   MouseEventHandler,
   ReactNode,
   useContext,
+  useEffect,
   useState
 } from 'react'
 import * as Popover from '@radix-ui/react-popover'
 import { ReactComponent as CrossIcon } from '@renderer/assets/img/cross.svg'
 import { ReactComponent as SettingIcon } from '@renderer/assets/img/setting.svg'
-import Button from '@renderer/components/commonComps/Button'
 import { clsx } from 'clsx'
 import { AppContext, AppContextI } from '@renderer/App'
 import { MainPanelContext, MainPanelContextI } from '../..'
 import Switch from '@renderer/components/commonComps/Switch'
 import Tooltip from '@renderer/components/commonComps/Tooltip'
 import Info from '@renderer/components/commonComps/Info'
+import Button from '@renderer/components/commonComps/Button'
 
 enum SettingType {
   input = 'SettingType/input',
@@ -101,7 +102,7 @@ interface SettingsProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 export default function Settings({ className }: SettingsProps): JSX.Element {
   // context
-  const { apiKey, setApiKey, OpenAI_URL, setOpenAI_URL, openAIAPIRef } = useContext(
+  const { openAIAPIKey, setOpenAIAPIKey, openAIURL, setOpenAIURL, openAIAPIRef } = useContext(
     AppContext as Context<AppContextI>
   )
 
@@ -114,6 +115,25 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     setOpen((prev) => !prev)
   }
+
+  const handleSave: MouseEventHandler<HTMLButtonElement> = (e) => {
+    window.electron.ipcRenderer.invoke('saveUserData', {
+      openAIAPIKey,
+      openAIURL,
+      stream
+    })
+  }
+
+  // effect
+  useEffect(() => {
+    window.electron.ipcRenderer.on('loadUserData', (event, storage) => {
+      const { openAIAPIKey: _openAIAPIKey, openAIURL: _openAIURL, stream: _stream } = storage
+
+      setOpenAIAPIKey(_openAIAPIKey)
+      setOpenAIURL(_openAIURL)
+      setStream(_stream)
+    })
+  }, [])
 
   return (
     <Popover.Root>
@@ -168,8 +188,8 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
               settingElement={'OpenAI-ApiKey'}
               placeholder="Your OpenAI ApiKey."
               description="请设置您的OpenAI APIKey，作者承诺将不会保存和使用您的任何数据。"
-              value={apiKey}
-              onChangeInput={(val): void => setApiKey(val)}
+              value={openAIAPIKey}
+              onChangeInput={(val): void => setOpenAIAPIKey(val)}
             />
             <SettingItem
               className="flex-grow"
@@ -178,8 +198,8 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
               settingElement={'OpenAI-URL'}
               placeholder="Your OpenAI URL."
               description="如果您拥有可以帮您转发请求的url，请设置您的OpenAI URL，此处设置的是openai的默认api url。"
-              value={OpenAI_URL}
-              onChangeInput={(val): void => setOpenAI_URL(val)}
+              value={openAIURL}
+              onChangeInput={(val): void => setOpenAIURL(val)}
             />
             <div className="flex gap-4 items-center">
               <div className="flex items-center gap-2">
@@ -199,6 +219,8 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
                 }}
               />
             </div>
+
+            <Button onClick={handleSave}>Save</Button>
           </div>
 
           <Popover.Arrow className="fill-white" />

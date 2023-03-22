@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios'
 
 export async function sendDetectReq(
   text: string,
-  apiKey: string
+  openAIAPIKey: string
   // proxyOrigin?: string
 ): Promise<AxiosResponse> {
   // url

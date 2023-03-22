@@ -55,7 +55,7 @@ interface TranslationProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 function Translation({ className }: TranslationProps, ref): JSX.Element {
   // context
-  const { apiKey, openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
+  const { openAIAPIKey, openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
 
   const { inputFromClipBoard, stream, mainInput } = useContext(
     MainPanelContext as Context<MainPanelContextI>
@@ -218,16 +218,6 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
     [handleTranslate, setIsSending]
   )
 
-  // effect
-  // useEffect(() => {
-  //   if (autoTranslate || inputFromClipBoard.current) {
-  //     if (input.length > 0) {
-  //       handleTranslate()
-  //     }
-  //   }
-  //   inputFromClipBoard.current = false
-  // }, [autoTranslate, inputFromClipBoard])
-
   useEffect(() => {
     if (inputFromClipBoard.current) {
       inputFromClipBoard.current = false
@@ -236,7 +226,7 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
   }, [input])
 
   useEffect(() => {
-    if (inputFromClipBoard.current) {
+    if (inputFromClipBoard.current && mainInput.length > 0) {
       setInput(mainInput)
     }
   }, [mainInput, inputFromClipBoard])

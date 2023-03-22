@@ -18,14 +18,12 @@ import { clsx } from 'clsx'
 import { ReactComponent as PinIcon } from '@renderer/assets/img/pin.svg'
 import Translation from './components/Translation'
 import { ReactComponent as CrossIcon } from '@renderer/assets/img/cross.svg'
-import { ReactComponent as OpenAIIcon } from '@renderer/assets/img/openai.svg'
 import { ReactComponent as PolishIcon } from '@renderer/assets/img/polish.svg'
 import { ReactComponent as ChatIcon } from '@renderer/assets/img/chat.svg'
 import { ReactComponent as TerminalIcon } from '@renderer/assets/img/terminal_line.svg'
 import { ReactComponent as TranslationIcon } from '@renderer/assets/img/translation.svg'
 import { ReactComponent as DownIcon } from '@renderer/assets/img/down.svg'
 import { ReactComponent as UpIcon } from '@renderer/assets/img/up.svg'
-import { ReactComponent as ContactIcon } from '@renderer/assets/img/contact.svg'
 import * as Tabs from '@radix-ui/react-tabs'
 import Toggle from '../commonComps/Toggle'
 import Settings from './components/Settings'
@@ -89,12 +87,12 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   const inputFromClipBoard = useRef<boolean>(false)
 
   // callback
-  const handleBlur: React.FocusEventHandler<HTMLDivElement> = (e) => {
-    // console.log('blur')
-    // if (isPin) return
-    // window.electron.ipcRenderer.invoke('suspension')
-    // setAppMode(AppMode.suspension)
-  }
+  // const handleBlur: React.FocusEventHandler<HTMLDivElement> = (e) => {
+  //   // console.log('blur')
+  //   // if (isPin) return
+  //   // window.electron.ipcRenderer.invoke('suspension')
+  //   // setAppMode(AppMode.suspension)
+  // }
 
   const handlePressPin: (val: boolean) => void = (e) => {
     window.electron.ipcRenderer.invoke('pin', !isPin)
@@ -149,7 +147,7 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
         'border absolute inset-0'
       )}
       tabIndex={0}
-      onBlur={handleBlur}
+      // onBlur={handleBlur}
     >
       <MainPanelContext.Provider
         value={{

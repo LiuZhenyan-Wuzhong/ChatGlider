@@ -2,7 +2,7 @@ import React, { Context, Dispatch, SetStateAction, useContext, useEffect, useSta
 import { AllHTMLAttributes } from 'react'
 import clsx from 'clsx'
 import { AppContext, AppContextI, AppMode } from '../../App'
-import { ReactComponent as OpenAIIcon } from '@renderer/assets/img/openai.svg'
+import { ReactComponent as OpenAIIcon } from '@renderer/assets/img/WuOpenAIlogo.svg'
 
 interface MainButtonProps extends AllHTMLAttributes<HTMLDivElement> {}
 

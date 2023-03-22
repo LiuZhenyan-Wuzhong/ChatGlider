@@ -1,4 +1,4 @@
-import ioHook from 'iohook-forglider'
+import ioHook from 'iohook'
 import { throttle, debounce } from 'lodash'
 
 export type MouseCallback = () => void

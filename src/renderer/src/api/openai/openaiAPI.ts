@@ -114,7 +114,7 @@ export default class OpenAIAPI {
 
   openaiURL?: string
 
-  apiKey?: string
+  openAIAPIKey?: string
 
   chatAbortController = new AbortController()
 
@@ -122,8 +122,8 @@ export default class OpenAIAPI {
   Knowledge cutoff: 2021-09-01
   Current date: ${new Date().toISOString().split('T')[0]}`
 
-  constructor(openaiURL?: string, apiKey?: string) {
-    this.apiKey = apiKey
+  constructor(openaiURL?: string, openAIAPIKey?: string) {
+    this.openAIAPIKey = openAIAPIKey
 
     this.openaiURL = openaiURL
   }
@@ -160,9 +160,9 @@ export abstract class APIHandlerBase {
   }
 
   protected get openaiAPIValid(): { valid: boolean; msg?: string } {
-    const { apiKey, openaiURL } = this._openaiAPI
+    const { openAIAPIKey, openaiURL } = this._openaiAPI
 
-    if (apiKey === undefined) {
+    if (openAIAPIKey === undefined) {
       return { valid: false, msg: '缺少APIKey' }
     }
 
@@ -209,7 +209,7 @@ export abstract class APIHandlerBase {
       throw new Error(this.openaiAPIValid.msg)
     }
 
-    const { apiKey, openaiURL } = this.openaiAPI
+    const { openAIAPIKey, openaiURL } = this.openaiAPI
 
     // url
     const absoluteUrl = openaiURL + path
@@ -218,7 +218,7 @@ export abstract class APIHandlerBase {
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
+        Authorization: `Bearer ${openAIAPIKey}`
       }
     }
 
