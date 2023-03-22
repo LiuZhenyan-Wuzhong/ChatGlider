@@ -1,3 +1,11 @@
+<picture align="center">
+  <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/WuOpenAIlogo.png">
+</picture>
+
+<p align="center">
+    <em>ChatGlider - powered by ChatGPT.</em>
+</p>
+
 # ChatGlider
 
 一个通过electron构建的桌面端划词翻译软件，提供方便快捷的全局翻译服务。同时实现了对话、代码分析、文章润色等功能。Powered by ChatGPT API
@@ -46,7 +54,7 @@ $ yarn build:mac
 欢迎提出更新意见，贡献代码，有闲的产品同学可以一起玩。
 
 个人微信：
-
+![wuzhong个人微信](https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/wuzhong_wechat.jpg)
 
 ## Reference
 灵感来源于项目:<a href=https://github.com/yetone/openai-translator>openai-translator</a>
