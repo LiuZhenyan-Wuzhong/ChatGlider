@@ -1,12 +1,11 @@
-<div style="width:100%">
-  <picture align="center">
+<div align="center">
+  <picture>
     <img alt="ChatGlider" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/WuOpenAIlogo.png" style="width:300px;margin:auto;">
   </picture>
-</div>
-
-<p align="center">
+  <p>
     <em>ChatGlider - powered by ChatGPT.</em>
-</p>
+  </p>
+</div>
 
 # ChatGlider
 
@@ -56,9 +55,14 @@ $ yarn build:mac
 欢迎提出更新意见，贡献代码，有闲的产品同学可以一起玩。
 
 个人微信：
-<picture align="center">
-  <img alt="wuzhong个人微信" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/wuzhong_wechat.jpg" style="width:200px">
-</picture>
+<div align="center">
+  <picture>
+    <img alt="wuzhong个人微信" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/wuzhong_wechat.jpg" width="200">
+  </picture>
+</div>
+
 
 ## Reference
-灵感来源于项目:<a href=https://github.com/yetone/openai-translator>openai-translator</a>
+灵感来源于项目:<a href="https://github.com/yetone/openai-translator">openai-translator</a>
+
+脚手架使用了<a href="https://github.com/alex8088/electron-vite">electron-vite</a>，感谢它的作者
