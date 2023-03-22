@@ -49,4 +49,4 @@ $ yarn build:mac
 
 
 ## Reference
-灵感来源于openai-translator项目：https://github.com/yetone/openai-translator
+灵感来源于项目:<a href=https://github.com/yetone/openai-translator>openai-translator</a>
