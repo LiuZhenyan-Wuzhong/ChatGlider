@@ -5,3 +5,5 @@ out
 proxy
 .env.*.local
 .env.local
+electron.vite.config.*.mjs
+ROADMAP.md
