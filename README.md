@@ -1,6 +1,8 @@
-<picture align="center">
-  <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/WuOpenAIlogo.png">
-</picture>
+<div style="width:100%">
+  <picture align="center">
+    <img alt="ChatGlider" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/WuOpenAIlogo.png" style="width:300px;margin:auto;">
+  </picture>
+</div>
 
 <p align="center">
     <em>ChatGlider - powered by ChatGPT.</em>
@@ -54,7 +56,9 @@ $ yarn build:mac
 欢迎提出更新意见，贡献代码，有闲的产品同学可以一起玩。
 
 个人微信：
-![wuzhong个人微信](https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/wuzhong_wechat.jpg)
+<picture align="center">
+  <img alt="wuzhong个人微信" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/wuzhong_wechat.jpg" style="width:200px">
+</picture>
 
 ## Reference
 灵感来源于项目:<a href=https://github.com/yetone/openai-translator>openai-translator</a>
