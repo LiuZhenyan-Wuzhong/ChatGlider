@@ -2,8 +2,10 @@ import {
   AllHTMLAttributes,
   ChangeEventHandler,
   Context,
+  Dispatch,
   MouseEventHandler,
   ReactNode,
+  SetStateAction,
   useContext,
   useEffect,
   useState
@@ -99,18 +101,18 @@ function SettingItem({
   )
 }
 
-interface SettingsProps extends AllHTMLAttributes<HTMLDivElement> {}
+interface SettingsProps extends AllHTMLAttributes<HTMLDivElement> {
+  open: boolean
+  setOpen: Dispatch<SetStateAction<boolean>>
+}
 
-export default function Settings({ className }: SettingsProps): JSX.Element {
+export default function Settings({ className, open, setOpen }: SettingsProps): JSX.Element {
   // context
   const { openAIAPIKey, setOpenAIAPIKey, openAIURL, setOpenAIURL, openAIAPIRef } = useContext(
     AppContext as Context<AppContextI>
   )
 
   const { stream, setStream } = useContext(MainPanelContext as Context<MainPanelContextI>)
-
-  // state
-  const [open, setOpen] = useState(false)
 
   // callback
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -137,7 +139,7 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
   }, [])
 
   return (
-    <Popover.Root>
+    <Popover.Root open={open}>
       <Popover.Trigger asChild>
         <button
           onClick={handleClick}

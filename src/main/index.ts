@@ -30,6 +30,7 @@ interface UsetStorage {
   openAIAPIKey?: string
   openAIURL?: string
   stream?: boolean
+  trailCount: number
 }
 
 // read
@@ -37,9 +38,11 @@ async function loadStorage(): Promise<UsetStorage> {
   try {
     const data = await fsPromises.readFile(storagePath, { encoding: 'utf-8', flag: 'r' })
 
+    // init
     if (data.length === 0) {
-      return {}
+      return { trailCount: 0 }
     }
+
     return JSON.parse(data)
   } catch (err) {
     console.error(err)
@@ -48,7 +51,7 @@ async function loadStorage(): Promise<UsetStorage> {
 
     console.log('创建了用户数据目录。')
 
-    return {}
+    return { trailCount: 0 }
   }
 }
 
@@ -107,15 +110,36 @@ function createWindow(): BrowserWindow {
   return mainWindow
 }
 
+const note = ({
+  title,
+  body,
+  onClick
+}: {
+  title: string
+  body: string
+  onClick?: (notification: Notification) => void
+}): void => {
+  const notification = new Notification({
+    title,
+    body,
+    icon: path.resolve(__dirname, '../../public/img/favicon.ico'),
+    closeButtonText: '关闭'
+  })
+  notification.on('click', (): void => {
+    onClick ? onClick(notification) : notification.close()
+  })
+  notification.show()
+}
+
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('ChatGlider')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
   if (process.platform === 'win32') {
-    app.setAppUserModelId(process.execPath)
+    app.setAppUserModelId('ChatGlider')
   }
 
   // window
@@ -171,17 +195,44 @@ app.whenReady().then(() => {
 
   loadStorage().then((storage) => {
     mainWindow.webContents.send('loadUserData', storage)
-  })
 
-  const notification = new Notification({
-    title: 'ChatGlider已经准备好',
-    body: '全局划词翻译已上线，双击选中单词或划选文字即可触发翻译入口。',
-    closeButtonText: '关闭'
+    let { openAIAPIKey } = storage
+
+    openAIAPIKey = ''
+
+    if (openAIAPIKey && openAIAPIKey.length > 0) {
+      note({
+        title: 'ChatGlider已经准备好',
+        body: '全局划词翻译已上线，双击选中单词或划选文字即可触发翻译入口。'
+      })
+    } else {
+      note({
+        title: '尚未配置您的 OpenAI_APIKey',
+        body: '请点击当前标签进入设置页面配置您的 OpenAI_APIKey。',
+        onClick: (notification) => {
+          // show
+          mainWindow.show()
+
+          // reposition
+          const { width: screenWidth, height: screenHeight } =
+            screen.getPrimaryDisplay().workAreaSize
+
+          const [winWidth, winHeight] = mainWindow.getContentSize()
+
+          mainWindow.setPosition(
+            Math.ceil((screenWidth - winWidth) / 2),
+            Math.ceil((screenHeight - winHeight) / 2)
+          )
+
+          // msg
+          mainWindow.webContents.send('openSettings')
+
+          // close
+          notification.close()
+        }
+      })
+    }
   })
-  notification.on('click', () => {
-    notification.close()
-  })
-  notification.show()
 
   const mouseUpUserCallback = async (): Promise<void> => {
     const cursor = screen.getCursorScreenPoint()
@@ -252,6 +303,7 @@ app.whenReady().then(() => {
     mainWindow.setFocusable(true)
     mainWindow.setResizable(true)
     mainWindow.setContentSize(660, 420)
+    mainWindow.setOpacity(1)
     mainWindow.setMinimumSize(400, 340)
 
     if (fromSuspension) {
@@ -274,7 +326,7 @@ app.whenReady().then(() => {
     mainWindow.setMinimumSize(30, 30)
     mainWindow.setFocusable(false)
     mainWindow.setResizable(false)
-    mainWindow.setOpacity(0.5)
+    mainWindow.setOpacity(0.75)
     mainWindow.setContentSize(31, 31)
   })
 
@@ -302,6 +354,27 @@ app.whenReady().then(() => {
 
     await saveStorage(storage)
   })
+
+  // ipcMain.handle('sendRequest', async (event) => {
+  //   const storage = await loadStorage()
+  //   const { openAIAPIKey } = storage
+  //   if (openAIAPIKey === import.meta.env.MAIN_VITE_TRIAL_OPENAI_API_KEY) {
+  //     storage.trailCount++
+  //     await saveStorage(storage)
+
+  //     if (import.meta.env.MAIN_VITE_TRIALS) {
+  //       const trials = parseInt(import.meta.env.MAIN_VITE_TRIALS)
+  //       if (storage.trailCount >= trials) {
+  //         return { trial: true, trailCount: storage.trailCount, trials, goon: false }
+  //       } else {
+  //         return { trial: true, trailCount: storage.trailCount, trials, goon: true }
+  //       }
+  //     }
+  //     return { trial: false }
+  //   } else {
+  //     return { trial: false }
+  //   }
+  // })
 
   ipcMain.handle('openBrowser', async (event, url) => {
     shell.openExternal(url)

@@ -98,7 +98,7 @@
     "appId":"ChatGlider",
     "win":{
       "icon":"./public/img/favicon.ico",
-      "requestedExecutionLevel":"requireAdministrator"
+      "requestedExecutionLevel":"highestAvailable"
     },
     "mac":{
       "icon":"./public/img/favicon.ico"

@@ -81,6 +81,9 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
 
   const [stream, setStream] = useState(true)
 
+  // state
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
   // ref
   const mainPanelRef = useRef<HTMLDivElement>(null)
 
@@ -134,6 +137,14 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
     })
     window.electron.ipcRenderer.on('suspension', (e) => {
       setAppMode(AppMode.suspension)
+    })
+
+    window.electron.ipcRenderer.on('openSettings', (e) => {
+      window.electron.ipcRenderer.invoke('expand', true)
+
+      setAppMode(AppMode.expand)
+
+      setSettingsOpen(true)
     })
   }, [])
 
@@ -209,7 +220,7 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
                   )}
 
                   <Tooltip content="设置">
-                    <Settings />
+                    <Settings open={settingsOpen} setOpen={setSettingsOpen} />
                   </Tooltip>
 
                   <Tooltip content={isPin ? '取消置顶' : '置顶'}>

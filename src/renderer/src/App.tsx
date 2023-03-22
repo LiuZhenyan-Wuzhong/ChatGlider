@@ -12,13 +12,9 @@ import OpenAIAPI from './api/openai/openaiAPI'
 import MainButton from './components/MainButton'
 import MainPanel from './components/MainPanel'
 
-const initOpenAIApiKey = import.meta.env['RENDERER_VITE_OPENAI_API_KEY']
-  ? import.meta.env['RENDERER_VITE_OPENAI_API_KEY']
-  : ''
+const initOpenAIApiKey = import.meta.env['RENDERER_VITE_OPENAI_API_KEY'] || ''
 
-const initOpenAIUrl = import.meta.env['RENDERER_VITE_OPENAI_API_PROXY']
-  ? import.meta.env['RENDERER_VITE_OPENAI_API_PROXY']
-  : 'https://api.openai.com'
+const initOpenAIUrl = import.meta.env['RENDERER_VITE_OPENAI_API_PROXY'] || 'https://api.openai.com'
 
 export interface AppContextI {
   appMode: AppMode
