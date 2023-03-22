@@ -5,12 +5,12 @@ type TooltipUIProperty = AllHTMLAttributes<HTMLDivElement> & Parameters<typeof T
 
 const Tooltip = ({ className, content, children }: TooltipUIProperty): JSX.Element => {
   return (
-    <TooltipUI.Provider>
+    <TooltipUI.Provider delayDuration={300}>
       <TooltipUI.Root>
         <TooltipUI.Trigger>{children}</TooltipUI.Trigger>
         <TooltipUI.Portal>
           <TooltipUI.Content
-            className="z-50 flex max-w-[480px] select-none rounded-lg bg-[var(--bg-base)] px-3 py-2 text-xs font-normal leading-5 text-[var(--label-muted)] shadow-md transition duration-300 ease-out bg-white border"
+            className="z-50 flex max-w-[480px] select-none rounded-lg bg-[var(--bg-base)] px-3 py-2 text-xs font-normal leading-5 text-[var(--label-muted)] shadow-md transition-all duration-300 ease-out bg-white border"
             sideOffset={5}
             side="top"
             align="center"

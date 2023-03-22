@@ -1,5 +1,16 @@
-import { app, shell, BrowserWindow, screen, ipcMain, Tray, Menu, clipboard } from 'electron'
+import {
+  app,
+  shell,
+  BrowserWindow,
+  screen,
+  ipcMain,
+  Tray,
+  Menu,
+  clipboard,
+  Notification
+} from 'electron'
 import fs from 'fs'
+import process from 'process'
 import fsPromises from 'fs/promises'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -103,6 +114,10 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  if (process.platform === 'win32') {
+    app.setAppUserModelId(process.execPath)
+  }
+
   // window
   const mainWindow = createWindow()
 
@@ -157,6 +172,16 @@ app.whenReady().then(() => {
   loadStorage().then((storage) => {
     mainWindow.webContents.send('loadUserData', storage)
   })
+
+  const notification = new Notification({
+    title: 'ChatGlider已经准备好',
+    body: '全局划词翻译已上线，双击选中单词或划选文字即可触发翻译入口。',
+    closeButtonText: '关闭'
+  })
+  notification.on('click', () => {
+    notification.close()
+  })
+  notification.show()
 
   const mouseUpUserCallback = async (): Promise<void> => {
     const cursor = screen.getCursorScreenPoint()
@@ -249,6 +274,7 @@ app.whenReady().then(() => {
     mainWindow.setMinimumSize(30, 30)
     mainWindow.setFocusable(false)
     mainWindow.setResizable(false)
+    mainWindow.setOpacity(0.5)
     mainWindow.setContentSize(31, 31)
   })
 

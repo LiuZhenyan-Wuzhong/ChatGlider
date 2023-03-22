@@ -18,6 +18,7 @@ import Switch from '@renderer/components/commonComps/Switch'
 import Tooltip from '@renderer/components/commonComps/Tooltip'
 import Info from '@renderer/components/commonComps/Info'
 import Button from '@renderer/components/commonComps/Button'
+import PrimayButton from '@renderer/components/commonComps/PrimaryButton'
 
 enum SettingType {
   input = 'SettingType/input',
@@ -220,7 +221,7 @@ export default function Settings({ className }: SettingsProps): JSX.Element {
               />
             </div>
 
-            <Button onClick={handleSave}>Save</Button>
+            <PrimayButton onClick={handleSave}>Save</PrimayButton>
           </div>
 
           <Popover.Arrow className="fill-white" />

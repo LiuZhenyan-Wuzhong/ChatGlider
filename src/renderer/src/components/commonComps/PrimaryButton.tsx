@@ -3,25 +3,23 @@
 import { clsx } from 'clsx'
 import { AllHTMLAttributes } from 'react'
 
-interface ButtonProps extends AllHTMLAttributes<HTMLButtonElement> {}
+interface PrimayButtonProps extends AllHTMLAttributes<HTMLButtonElement> {}
 
-export default function Button({
+export default function PrimayButton({
   className,
   onClick,
   children,
   disabled,
   type
-}: ButtonProps): JSX.Element {
+}: PrimayButtonProps): JSX.Element {
   return (
     <button
       type={type === 'submit' ? type : 'button'}
       id="ping"
       className={clsx(
-        'z-30 rounded-lg p-1 flex items-center justify-center border border-gray-100',
+        'z-30 rounded-lg p-1 flex items-center justify-center border text-white bg-blue-500',
         'transition-all ease-in-out duration-200',
-        disabled
-          ? 'text-gray-300'
-          : 'text-gray-600 hover:border hover:border-gray-300 hover:bg-gray-200 hover:shadow active:bg-gray-300',
+        disabled ? 'bg-blue-300' : 'hover:border hover:bg-blue-600 hover:shadow active:bg-blue-700',
         className
       )}
       onClick={onClick}
