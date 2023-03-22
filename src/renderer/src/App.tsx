@@ -65,9 +65,9 @@ export default function App({ className }: AppProps): JSX.Element {
     window.electron.ipcRenderer.on('loadUserData', (event, storage) => {
       const { openAIAPIKey: _openAIAPIKey, openAIURL: _openAIURL, stream: _stream } = storage
 
-      setOpenAIAPIKey(_openAIAPIKey)
-      setOpenAIURL(_openAIURL)
-      setStream(_stream)
+      setOpenAIAPIKey(_openAIAPIKey || '')
+      setOpenAIURL(_openAIURL || '')
+      setStream(_stream === undefined ? true : _stream)
     })
   }, [])
 

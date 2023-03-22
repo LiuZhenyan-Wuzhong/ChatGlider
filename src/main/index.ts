@@ -193,6 +193,8 @@ app.whenReady().then(() => {
     handler.listen()
 
     loadStorage().then((storage) => {
+      console.log('loadUserData', storage)
+
       mainWindow.webContents.send('loadUserData', storage)
 
       note({
