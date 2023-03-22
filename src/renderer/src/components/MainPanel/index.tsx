@@ -154,6 +154,10 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
     // })
   }, [])
 
+  useEffect(() => {
+    window.electron.ipcRenderer.invoke('setIfCopyWhenExpand', !settingsOpen)
+  }, [settingsOpen])
+
   return (
     <div
       id="container"

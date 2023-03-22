@@ -26,6 +26,8 @@ enum WindowMode {
 
 const storagePath = path.join(app.getPath('userData'), 'storage.json')
 
+let ifCopyWhenExpand = true
+
 interface UsetStorage {
   openAIAPIKey?: string
   openAIURL?: string
@@ -219,7 +221,7 @@ app.whenReady().then(() => {
     }
 
     // sendCopiedText
-    if (pin) {
+    if (pin && ifCopyWhenExpand) {
       try {
         const text = await copySelectedText()
 
@@ -366,6 +368,10 @@ app.whenReady().then(() => {
 
   ipcMain.handle('openBrowser', async (event, url) => {
     shell.openExternal(url)
+  })
+
+  ipcMain.handle('setIfCopyWhenExpand', async (event, val: boolean) => {
+    ifCopyWhenExpand = val
   })
 })
 
