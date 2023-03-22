@@ -136,7 +136,7 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
     } else {
       console.error('error: ', err)
 
-      setOutput('error')
+      setOutput((err as Error).message)
     }
   }, [])
 

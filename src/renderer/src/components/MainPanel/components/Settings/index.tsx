@@ -76,7 +76,8 @@ function SettingItem({
           className={clsx(
             'w-full flex items-center justify-center flex-1 rounded py-0.5 px-2.5 text-xs bg-white border',
             'text-gray-700',
-            'focus:bg-white focus:shadow-sm focus:shadow-opacity-50 focus:outline-none'
+            'focus:bg-white focus:shadow-sm focus:shadow-opacity-50 focus:outline-none',
+            value.length === 0 ? 'ring-2 ring-red-500 bg-red-100 text-red-600' : ''
           )}
           id={settingName}
           placeholder={placeholder}
@@ -89,7 +90,8 @@ function SettingItem({
           className={clsx(
             'w-full flex items-center justify-center leading-sm rounded py-1 px-2.5 text-xs bg-white border',
             'text-gray-700',
-            'focus:bg-white focus:shadow-sm focus:shadow-opacity-50 focus:outline-none'
+            'focus:bg-white focus:shadow-sm focus:shadow-opacity-50 focus:outline-none',
+            value.length === 0 ? 'ring-2 ring-red-500 bg-red-100 text-red-600' : ''
           )}
           style={{ resize: 'none' }}
           id={settingName}
@@ -108,34 +110,37 @@ interface SettingsProps extends AllHTMLAttributes<HTMLDivElement> {
 
 export default function Settings({ className, open, setOpen }: SettingsProps): JSX.Element {
   // context
-  const { openAIAPIKey, setOpenAIAPIKey, openAIURL, setOpenAIURL, openAIAPIRef } = useContext(
-    AppContext as Context<AppContextI>
-  )
+  const {
+    openAIAPIKey,
+    setOpenAIAPIKey,
+    openAIURL,
+    setOpenAIURL,
+    openAIAPIRef,
+    stream,
+    setStream
+  } = useContext(AppContext as Context<AppContextI>)
 
-  const { stream, setStream } = useContext(MainPanelContext as Context<MainPanelContextI>)
+  // state
+  const [saveDisabled, setSaveDisabled] = useState(false)
 
   // callback
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     setOpen((prev) => !prev)
   }
 
-  const handleSave: MouseEventHandler<HTMLButtonElement> = (e) => {
-    window.electron.ipcRenderer.invoke('saveUserData', {
+  const handleSave: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    setSaveDisabled(true)
+    const success = await window.electron.ipcRenderer.invoke('saveUserData', {
       openAIAPIKey,
       openAIURL,
       stream
     })
+    setSaveDisabled(false)
   }
 
   // effect
   useEffect(() => {
-    window.electron.ipcRenderer.on('loadUserData', (event, storage) => {
-      const { openAIAPIKey: _openAIAPIKey, openAIURL: _openAIURL, stream: _stream } = storage
-
-      setOpenAIAPIKey(_openAIAPIKey)
-      setOpenAIURL(_openAIURL)
-      setStream(_stream)
-    })
+    window.electron.ipcRenderer.invoke('queryUserData')
   }, [])
 
   return (
@@ -143,6 +148,7 @@ export default function Settings({ className, open, setOpen }: SettingsProps): J
       <Popover.Trigger asChild>
         <button
           onClick={handleClick}
+          disabled={saveDisabled}
           className={clsx(
             'w-8 h-8 z-40 rounded-lg p-1 flex items-center justify-center border border-gray-100',
             'hover:border hover:border-gray-300 hover:bg-gray-200 hover:shadow',
@@ -185,7 +191,7 @@ export default function Settings({ className, open, setOpen }: SettingsProps): J
           <div className="flex flex-col gap-3">
             <div className="text-gray-700 font-medium">设置</div>
             <SettingItem
-              className="flex-grow"
+              className={clsx('flex-grow')}
               settingType={SettingType.textarea}
               settingName="OpenAI-ApiKey"
               settingElement={'OpenAI-ApiKey'}

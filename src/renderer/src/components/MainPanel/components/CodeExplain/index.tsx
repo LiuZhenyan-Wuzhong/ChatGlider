@@ -156,12 +156,12 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
         } else if (err.request) {
           console.error('message: ', err.message)
 
-          setOutput(err.message.toString())
+          setOutput(err.message)
         }
       } else {
         console.error('error: ', err)
 
-        setOutput('error')
+        setOutput((err as Error).message)
       }
     } finally {
       setIsSending(false)

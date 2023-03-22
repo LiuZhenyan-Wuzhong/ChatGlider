@@ -135,6 +135,7 @@ export default class OpenAIAPI {
     onMessage: (data: string) => void
   ): Promise<Response> => {
     // const fetchUrl = config.baseURL + url
+    console.log(config.headers)
 
     return OpenAIAPI.fetchSSE(
       absoluteUrl,
@@ -162,11 +163,11 @@ export abstract class APIHandlerBase {
   protected get openaiAPIValid(): { valid: boolean; msg?: string } {
     const { openAIAPIKey, openaiURL } = this._openaiAPI
 
-    if (openAIAPIKey === undefined) {
+    if (openAIAPIKey === undefined || openAIAPIKey.length === 0) {
       return { valid: false, msg: '缺少APIKey' }
     }
 
-    if (openaiURL === undefined) {
+    if (openaiURL === undefined || openaiURL.length === 0) {
       return { valid: false, msg: '缺少openaiURL' }
     }
 

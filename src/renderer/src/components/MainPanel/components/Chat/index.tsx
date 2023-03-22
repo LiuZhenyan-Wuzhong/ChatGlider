@@ -124,7 +124,7 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
 
       console.error('data: ', err.message)
     } else {
-      console.error('error: ', err)
+      console.error('error: ', (err as Error).message)
     }
   }, [])
 
@@ -139,7 +139,7 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
       } else {
         console.error('error: ', err)
 
-        receivingMessageRef.current.content = `Error`
+        receivingMessageRef.current.content = (err as Error).message
       }
     },
     []

@@ -102,7 +102,7 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
       } else {
         console.error('error: ', err)
 
-        setOutput('error')
+        setOutput((err as Error).message)
       }
     } finally {
       setIsSending(false)

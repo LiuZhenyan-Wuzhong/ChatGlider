@@ -41,8 +41,7 @@ export interface MainPanelContextI {
   mainInput: string
   setMainInput: Dispatch<SetStateAction<string>>
   inputFromClipBoard: React.MutableRefObject<boolean>
-  stream: boolean
-  setStream: Dispatch<SetStateAction<boolean>>
+  handleWithOutAPIKey: () => void
 }
 
 export const MainPanelContext = createContext<MainPanelContextI | null>(null)
@@ -70,7 +69,7 @@ interface MainPanelProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   // context
-  const { appMode, setAppMode } = useContext(AppContext as Context<AppContextI>)
+  const { appMode, setAppMode, openAIAPIKey } = useContext(AppContext as Context<AppContextI>)
 
   // state
   const [mainInput, setMainInput] = useState<string>('')
@@ -79,9 +78,6 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
 
   const [isPin, setIsPin] = useState<boolean>(false)
 
-  const [stream, setStream] = useState(true)
-
-  // state
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   // ref
@@ -96,6 +92,10 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   //   // window.electron.ipcRenderer.invoke('suspension')
   //   // setAppMode(AppMode.suspension)
   // }
+
+  const handleWithOutAPIKey = (): void => {
+    setSettingsOpen(true)
+  }
 
   const handlePressPin: (val: boolean) => void = (e) => {
     window.electron.ipcRenderer.invoke('pin', !isPin)
@@ -130,6 +130,12 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   }, [])
 
   useEffect(() => {
+    if (openAIAPIKey.length === 0) {
+      handleWithOutAPIKey()
+    }
+  }, [openAIAPIKey])
+
+  useEffect(() => {
     window.electron.ipcRenderer.on('sendCopiedText', (e, text) => {
       inputFromClipBoard.current = true
 
@@ -139,13 +145,13 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
       setAppMode(AppMode.suspension)
     })
 
-    window.electron.ipcRenderer.on('openSettings', (e) => {
-      window.electron.ipcRenderer.invoke('expand', true)
+    // window.electron.ipcRenderer.on('openSettings', (e) => {
+    //   window.electron.ipcRenderer.invoke('expand', true)
 
-      setAppMode(AppMode.expand)
+    //   setAppMode(AppMode.expand)
 
-      setSettingsOpen(true)
-    })
+    //   setSettingsOpen(true)
+    // })
   }, [])
 
   return (
@@ -168,8 +174,7 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
           mainInput,
           setMainInput,
           inputFromClipBoard,
-          stream,
-          setStream
+          handleWithOutAPIKey
         }}
       >
         <div className="w-full h-full relative flex flex-col text-gray-900 flex-grow">

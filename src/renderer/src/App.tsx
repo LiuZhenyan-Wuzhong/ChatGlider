@@ -12,9 +12,9 @@ import OpenAIAPI from './api/openai/openaiAPI'
 import MainButton from './components/MainButton'
 import MainPanel from './components/MainPanel'
 
-const initOpenAIApiKey = import.meta.env['RENDERER_VITE_OPENAI_API_KEY'] || ''
+const initOpenAIApiKey = '' //import.meta.env['RENDERER_VITE_OPENAI_API_KEY'] || ''
 
-const initOpenAIUrl = import.meta.env['RENDERER_VITE_OPENAI_API_PROXY'] || 'https://api.openai.com'
+const initOpenAIUrl = '' //import.meta.env['RENDERER_VITE_OPENAI_API_PROXY'] || 'https://api.openai.com'
 
 export interface AppContextI {
   appMode: AppMode
@@ -24,6 +24,8 @@ export interface AppContextI {
   openAIURL: string
   setOpenAIURL: Dispatch<SetStateAction<string>>
   openAIAPIRef: MutableRefObject<OpenAIAPI>
+  stream: boolean
+  setStream: Dispatch<SetStateAction<boolean>>
 }
 
 // context
@@ -45,6 +47,10 @@ export default function App({ className }: AppProps): JSX.Element {
 
   const [openAIURL, setOpenAIURL] = useState<string>(initOpenAIUrl)
 
+  const [stream, setStream] = useState(true)
+
+  // callback
+
   // effect
   useEffect(() => {
     openAIAPIRef.current.openAIAPIKey = openAIAPIKey
@@ -53,6 +59,17 @@ export default function App({ className }: AppProps): JSX.Element {
   useEffect(() => {
     openAIAPIRef.current.openaiURL = openAIURL
   }, [openAIURL])
+
+  // effect
+  useEffect(() => {
+    window.electron.ipcRenderer.on('loadUserData', (event, storage) => {
+      const { openAIAPIKey: _openAIAPIKey, openAIURL: _openAIURL, stream: _stream } = storage
+
+      setOpenAIAPIKey(_openAIAPIKey)
+      setOpenAIURL(_openAIURL)
+      setStream(_stream)
+    })
+  }, [])
 
   // ref
   const openAIAPIRef = useRef(new OpenAIAPI())
@@ -66,7 +83,9 @@ export default function App({ className }: AppProps): JSX.Element {
         setOpenAIAPIKey,
         openAIURL,
         setOpenAIURL,
-        openAIAPIRef
+        openAIAPIRef,
+        stream,
+        setStream
       }}
     >
       <div className="transition-all duration-300 ease-in-out">

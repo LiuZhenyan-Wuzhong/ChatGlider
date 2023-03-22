@@ -191,47 +191,15 @@ app.whenReady().then(() => {
     const handler = new MouseDragHandler(mouseDownUserCallback, mouseUpUserCallback)
 
     handler.listen()
-  })
 
-  loadStorage().then((storage) => {
-    mainWindow.webContents.send('loadUserData', storage)
+    loadStorage().then((storage) => {
+      mainWindow.webContents.send('loadUserData', storage)
 
-    let { openAIAPIKey } = storage
-
-    openAIAPIKey = ''
-
-    if (openAIAPIKey && openAIAPIKey.length > 0) {
       note({
         title: 'ChatGlider已经准备好',
         body: '全局划词翻译已上线，双击选中单词或划选文字即可触发翻译入口。'
       })
-    } else {
-      note({
-        title: '尚未配置您的 OpenAI_APIKey',
-        body: '请点击当前标签进入设置页面配置您的 OpenAI_APIKey。',
-        onClick: (notification) => {
-          // show
-          mainWindow.show()
-
-          // reposition
-          const { width: screenWidth, height: screenHeight } =
-            screen.getPrimaryDisplay().workAreaSize
-
-          const [winWidth, winHeight] = mainWindow.getContentSize()
-
-          mainWindow.setPosition(
-            Math.ceil((screenWidth - winWidth) / 2),
-            Math.ceil((screenHeight - winHeight) / 2)
-          )
-
-          // msg
-          mainWindow.webContents.send('openSettings')
-
-          // close
-          notification.close()
-        }
-      })
-    }
+    })
   })
 
   const mouseUpUserCallback = async (): Promise<void> => {
@@ -345,14 +313,32 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('saveUserData', async (event, userData) => {
-    const storage = await loadStorage()
-    const { openAIAPIKey, openAIURL, stream } = userData
+    try {
+      const storage = await loadStorage()
+      const { openAIAPIKey, openAIURL, stream } = userData
 
-    storage.openAIAPIKey = openAIAPIKey
-    storage.openAIURL = openAIURL
-    storage.stream = stream
+      storage.openAIAPIKey = openAIAPIKey
+      storage.openAIURL = openAIURL
+      storage.stream = stream
 
-    await saveStorage(storage)
+      await saveStorage(storage)
+
+      note({ title: 'ChatGlider Error', body: '保存设定成功。' })
+
+      return true
+    } catch (err) {
+      console.error(err)
+
+      note({ title: 'ChatGlider Error', body: (err as Error).message })
+
+      return false
+    }
+  })
+
+  ipcMain.handle('queryUserData', (event) => {
+    loadStorage().then((storage) => {
+      mainWindow.webContents.send('loadUserData', storage)
+    })
   })
 
   // ipcMain.handle('sendRequest', async (event) => {
