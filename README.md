@@ -1,6 +1,6 @@
 <div align="center">
   <picture>
-    <img alt="ChatGlider" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/WuOpenAIlogo.png" style="width:300px;margin:auto;">
+    <img alt="ChatGlider" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/WuOpenAIlogo.png">
   </picture>
   <p>
     <em>ChatGlider - powered by ChatGPT.</em>
@@ -13,6 +13,8 @@
 
 ## Quick Start
 将本项目的releases文件1.0（目前只支持win，mac以及linux版本正在路上）下载到本地，常规的安装流程，需要开启管理员权限以体验全部功能。
+
+<img alt="ChatGlider-usage" src="https://github.com/LiuZhenyan-Wuzhong/ChatGlider/blob/master/media/video1.0.0.gif">
 
 本项目特色：
 - 全局划词翻译，监听到划词时按钮弹出，轻松快捷
