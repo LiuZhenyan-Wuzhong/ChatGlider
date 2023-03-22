@@ -25,12 +25,8 @@ import { AxiosError } from 'axios'
 import { MainPanelContext, MainPanelContextI } from '../..'
 import ChatAPI from '@renderer/api/openai/chatAPI'
 import { ChatGPTModel } from '@renderer/api/openai/openaiAPI'
-import BinaryButton from '@renderer/components/commonComps/BinaryButton'
-import { githubLightInit } from '@uiw/codemirror-theme-github'
-import { EditorView } from '@codemirror/view'
-import CodeLangSelect from '@renderer/components/commonComps/Select'
-import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
+import Tooltip from '@renderer/components/commonComps/Tooltip'
 // import transcribe from '@renderer/api/alicloud'
 
 enum Role {
@@ -296,6 +292,18 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
     [handleSendMessage, setIsSending]
   )
 
+  const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = useCallback(
+    (e) => {
+      if (e.code === 'Enter') {
+        setIsSending(true)
+        console.log('active')
+
+        handleSendMessage()
+      }
+    },
+    [handleSendMessage, setIsSending]
+  )
+
   useEffect(() => {
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight
@@ -321,13 +329,16 @@ function Chat({ className }: ChatProps, ref): JSX.Element {
             placeholder="请输入您的问题或者聊天内容"
             value={input}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
             style={{ resize: 'none' }}
           />
           <div className="h-8 rounded-b-xl flex text-sm items-center bg-white justify-between">
             <div className="flex"></div>
-            <Button disabled={isSending} onClick={handleClickMute}>
-              <SendIcon />
-            </Button>
+            <Tooltip content={isSending ? '正在发送中' : '发送'}>
+              <Button disabled={isSending || input.length === 0} onClick={handleClickMute}>
+                <SendIcon />
+              </Button>
+            </Tooltip>
           </div>
         </div>
       </div>

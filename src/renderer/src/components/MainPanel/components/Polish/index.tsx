@@ -27,6 +27,7 @@ import PolishAPI from '@renderer/api/openai/polishAPI'
 import { ChatGPTModel } from '@renderer/api/openai/openaiAPI'
 import BinaryButton from '@renderer/components/commonComps/BinaryButton'
 import ReadButton from '@renderer/components/commonComps/ReadButton'
+import Tooltip from '@renderer/components/commonComps/Tooltip'
 
 export enum Language {
   en = 'en',
@@ -178,6 +179,18 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
     [handlePolish, setIsSending]
   )
 
+  const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = useCallback(
+    (e) => {
+      if (e.code === 'Enter') {
+        setIsSending(true)
+        console.log('active')
+
+        handlePolish()
+      }
+    },
+    [handlePolish, setIsSending]
+  )
+
   // effect
   useEffect(() => {
     if (autoPolish || inputFromClipBoard.current) {
@@ -187,52 +200,57 @@ function Polish({ className }: PolishProps, ref): JSX.Element {
   }, [autoPolish, inputFromClipBoard])
 
   return (
-    <div id="panel-body" className="relative p-4 flex flex-col flex-grow w-full rounded-xl gap-2">
-      <div className="flex flex-col">
-        <textarea
-          id="inputText"
-          ref={inputTextRef}
-          className="w-full h-24 p-3 rounded-t-xl focus:outline-none"
-          placeholder="请输入要润色的语段"
-          value={input}
-          onChange={handleChange}
-        />
+    <div id="panel-body" className="relative flex-grow w-full rounded-xl">
+      <div className="absolute inset-0 p-4 flex flex-col gap-2">
+        <div className="flex flex-col z-10 p-3 h-1/2 flex-grow rounded-xl bg-white">
+          <textarea
+            id="inputText"
+            ref={inputTextRef}
+            className="w-full h-min-24 focus:outline-none flex-grow verflow-y-scroll overflow-x-hidden scroll-mr-2"
+            placeholder="请输入要润色的语段"
+            value={input}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            style={{ resize: 'none' }}
+          />
 
-        <div className="h-12 rounded-b-2xl p-2 flex text-sm items-center bg-white justify-between">
-          <div className="flex">
-            {/* <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
+          <div className="h-8 rounded-b-xl flex text-sm items-center bg-white justify-between">
+            <div className="flex">
+              {/* <div className="p-1 px-3 bg-gray-200 flex gap-2 rounded-full items-center">
               <Detect languageMap={languageMap} />
             </div> */}
-            <LanguageSelect
-              value={language}
-              onValueChange={(val: Language): void => setLanguage(val)}
-              descMap={languageMap}
-            />
+            </div>
+            {stream ? (
+              <Tooltip content={isSending ? '暂停' : '发送'}>
+                <BinaryButton
+                  className="border-white"
+                  disabled={isAborting || input.length === 0}
+                  active={isSending}
+                  onMuteClick={handleClickMute}
+                  onActiveClick={handleClickActive}
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip content={isSending ? '正在发送中' : '发送'}>
+                <Button disabled={isSending || input.length === 0} onClick={handleClickMute}>
+                  <SendIcon />
+                </Button>
+              </Tooltip>
+            )}
           </div>
-          {stream ? (
-            <BinaryButton
-              className="border-white"
-              disabled={!isAborting}
-              active={isSending}
-              onMuteClick={handleClickMute}
-              onActiveClick={handleClickActive}
-            />
-          ) : (
-            <Button disabled={isSending}>
-              <SendIcon />
-            </Button>
-          )}
         </div>
-      </div>
 
-      <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow">
-        <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
-          {/* <ReadButton text={output} /> */}
-          <Button className="border-white" onClick={handleCopy}>
-            <CopyIcon className="border-white w-5 h-5" />
-          </Button>
+        <div className="w-full rounded-xl bg-white p-2 flex flex-col h-1/2 flex-grow z-10">
+          <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
+            {/* <ReadButton text={output} /> */}
+            <Button className="border-white" onClick={handleCopy}>
+              <CopyIcon className="border-white w-5 h-5" />
+            </Button>
+          </div>
+          <div className="p-1 flex-grow overflow-y-scroll">
+            <div className="h-full">{output}</div>
+          </div>
         </div>
-        <div className="p-1 flex-grow">{output}</div>
       </div>
     </div>
   )

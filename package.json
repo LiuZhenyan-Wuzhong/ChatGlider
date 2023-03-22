@@ -41,6 +41,7 @@
     "@codemirror/view": "^6.9.2",
     "@electron-toolkit/preload": "^1.0.3",
     "@electron-toolkit/utils": "^1.0.2",
+    "@radix-ui/react-hover-card": "^1.0.5",
     "@radix-ui/react-popover": "^1.0.5",
     "@radix-ui/react-select": "^1.2.1",
     "@radix-ui/react-switch": "^1.0.2",
@@ -93,8 +94,7 @@
   },
   "license": "MIT",
   "build": {
-    "npmRebuild": true,
-    "npmSkipBuildFromSource": true
+    "npmRebuild": false
   },
   "iohook": {
     "targets": [

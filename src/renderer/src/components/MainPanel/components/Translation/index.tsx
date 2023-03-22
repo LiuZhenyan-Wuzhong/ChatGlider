@@ -22,6 +22,7 @@ import TranslateAPI from '@renderer/api/openai/translateAPI'
 import BinaryButton from '@renderer/components/commonComps/BinaryButton'
 import { ChatGPTModel } from '@renderer/api/openai/openaiAPI'
 import ReadButton from '@renderer/components/commonComps/ReadButton'
+import Tooltip from '@renderer/components/commonComps/Tooltip'
 // import transcribe from '@renderer/api/alicloud'
 
 export enum Language {
@@ -56,7 +57,9 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
   // context
   const { apiKey, openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
 
-  const { inputFromClipBoard, stream } = useContext(MainPanelContext as Context<MainPanelContextI>)
+  const { inputFromClipBoard, stream, mainInput } = useContext(
+    MainPanelContext as Context<MainPanelContextI>
+  )
 
   // state
   const [input, setInput] = useState<string>('')
@@ -69,7 +72,7 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
 
   const [output, setOutput] = useState<string>('')
 
-  const [autoTranslate, setAutoTranslate] = useState<boolean>(false)
+  // const [autoTranslate, setAutoTranslate] = useState<boolean>(false)
 
   const [isAborting, setIsAborting] = useState<boolean>(false)
 
@@ -203,15 +206,40 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
     [handleTranslate, setIsSending]
   )
 
-  // effect
-  useEffect(() => {
-    if (autoTranslate || inputFromClipBoard.current) {
-      if (input.length > 0) {
+  const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = useCallback(
+    (e) => {
+      if (e.code === 'Enter') {
+        setIsSending(true)
+        console.log('active')
+
         handleTranslate()
       }
+    },
+    [handleTranslate, setIsSending]
+  )
+
+  // effect
+  // useEffect(() => {
+  //   if (autoTranslate || inputFromClipBoard.current) {
+  //     if (input.length > 0) {
+  //       handleTranslate()
+  //     }
+  //   }
+  //   inputFromClipBoard.current = false
+  // }, [autoTranslate, inputFromClipBoard])
+
+  useEffect(() => {
+    if (inputFromClipBoard.current) {
+      inputFromClipBoard.current = false
+      handleTranslate()
     }
-    inputFromClipBoard.current = false
-  }, [autoTranslate, inputFromClipBoard])
+  }, [input])
+
+  useEffect(() => {
+    if (inputFromClipBoard.current) {
+      setInput(mainInput)
+    }
+  }, [mainInput, inputFromClipBoard])
 
   return (
     <div id="panel-body" className="relative flex-grow w-full rounded-xl">
@@ -224,6 +252,7 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
             placeholder="请输入要翻译的语段"
             value={input}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
             style={{ resize: 'none' }}
           />
           <div className="h-8 rounded-b-xl flex text-sm items-center bg-white justify-between">
@@ -249,17 +278,21 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
             </div> */}
             </div>
             {stream ? (
-              <BinaryButton
-                className="border-white"
-                disabled={isAborting}
-                active={isSending}
-                onMuteClick={handleClickMute}
-                onActiveClick={handleClickActive}
-              />
+              <Tooltip content={isSending ? '暂停' : '发送'}>
+                <BinaryButton
+                  className="border-white"
+                  disabled={isAborting || input.length === 0}
+                  active={isSending}
+                  onMuteClick={handleClickMute}
+                  onActiveClick={handleClickActive}
+                />
+              </Tooltip>
             ) : (
-              <Button disabled={isSending} onClick={handleClickMute}>
-                <SendIcon />
-              </Button>
+              <Tooltip content={isSending ? '正在发送中' : '发送'}>
+                <Button disabled={isSending || input.length === 0} onClick={handleClickMute}>
+                  <SendIcon />
+                </Button>
+              </Tooltip>
             )}
           </div>
         </div>
@@ -267,9 +300,11 @@ function Translation({ className }: TranslationProps, ref): JSX.Element {
         <div className="w-full rounded-xl bg-white p-2 flex flex-col h-1/2 flex-grow z-10">
           <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
             {/* <ReadButton text={output} /> */}
-            <Button className="border-white" onClick={handleCopy}>
-              <CopyIcon className="border-white w-5 h-5" />
-            </Button>
+            <Tooltip content="复制">
+              <Button className="border-white" onClick={handleCopy}>
+                <CopyIcon className="border-white w-5 h-5" />
+              </Button>
+            </Tooltip>
           </div>
           <div className="p-1 flex-grow overflow-y-scroll">
             <div className="h-full">{output}</div>

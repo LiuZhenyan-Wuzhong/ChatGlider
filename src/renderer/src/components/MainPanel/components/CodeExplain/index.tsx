@@ -45,6 +45,7 @@ import { EditorView } from '@codemirror/view'
 import CodeLangSelect from '@renderer/components/commonComps/Select'
 import { LanguageSupport } from '@codemirror/language'
 import ReadButton from '@renderer/components/commonComps/ReadButton'
+import Tooltip from '@renderer/components/commonComps/Tooltip'
 // import transcribe from '@renderer/api/alicloud'
 
 enum CodeLang {
@@ -138,9 +139,7 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
   const handleCodeExplain = useCallback(async () => {
     setIsSending(true)
 
-    console.log('codeExplain: ')
-
-    // console.log('codeExplain: ', input)
+    console.log('codeExplain: ', input)
 
     try {
       const text = await codeExplain(input)
@@ -248,6 +247,20 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
     [handleCodeExplain, setIsSending]
   )
 
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
+    (e) => {
+      e.stopPropagation()
+
+      if (e.code === 'Enter' && e.ctrlKey) {
+        setIsSending(true)
+        console.log('active')
+
+        handleCodeExplain()
+      }
+    },
+    [handleCodeExplain, setIsSending]
+  )
+
   // effect
   useEffect(() => {
     if (autoCodeExplain || inputFromClipBoard.current) {
@@ -271,6 +284,7 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
               theme={githubLightInit({
                 settings: { caret: '#c6c6c6', fontFamily: 'monospace' }
               })}
+              onKeyDown={handleKeyDown}
               extensions={[
                 styleTheme,
                 codeLangExtensionMap[inputCodeLang]({ jsx: true }),
@@ -290,17 +304,21 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
                 />
               </div>
               {stream ? (
-                <BinaryButton
-                  className="border-white"
-                  disabled={!isAborting}
-                  active={isSending}
-                  onMuteClick={handleClickMute}
-                  onActiveClick={handleClickActive}
-                />
+                <Tooltip content={isSending ? '暂停' : '发送'}>
+                  <BinaryButton
+                    className="border-white"
+                    disabled={isAborting || input.length === 0}
+                    active={isSending}
+                    onMuteClick={handleClickMute}
+                    onActiveClick={handleClickActive}
+                  />
+                </Tooltip>
               ) : (
-                <Button disabled={isSending}>
-                  <SendIcon />
-                </Button>
+                <Tooltip content={isSending ? '正在发送中' : '发送'}>
+                  <Button disabled={isSending || input.length === 0} onClick={handleClickMute}>
+                    <SendIcon />
+                  </Button>
+                </Tooltip>
               )}
             </div>
           </div>
@@ -309,11 +327,15 @@ function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
         <div className="w-full rounded-xl bg-white p-2 flex flex-col flex-grow h-1/2">
           <div className="rounded-b-2xl flex justify-end gap-2 text-gray-800">
             {/* <ReadButton text={output} /> */}
-            <Button className="border-white" onClick={handleCopy}>
-              <CopyIcon className="border-white w-5 h-5" />
-            </Button>
+            <Tooltip content="复制">
+              <Button className="border-white" onClick={handleCopy}>
+                <CopyIcon className="border-white w-5 h-5" />
+              </Button>
+            </Tooltip>
           </div>
-          <div className="p-1 flex-grow">{output}</div>
+          <div className="p-1 flex-grow overflow-y-scroll">
+            <div className="h-full">{output}</div>
+          </div>
         </div>
       </div>
     </div>

@@ -38,8 +38,8 @@ function createWindow(): BrowserWindow {
   // mainWindow.setAspectRatio(1)
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
-    mainWindow.webContents.openDevTools()
+    // mainWindow.show()
+    // mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -109,9 +109,9 @@ app.whenReady().then(() => {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.setZoomFactor(1.0)
 
-    // const handler = new MouseDragHandler(mouseDownUserCallback, mouseUpUserCallback)
+    const handler = new MouseDragHandler(mouseDownUserCallback, mouseUpUserCallback)
 
-    // handler.listen()
+    handler.listen()
   })
 
   const mouseUpUserCallback = async (): Promise<void> => {
@@ -228,41 +228,6 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
-// let workInProgress = false
-
-// const interval = 16
-
-// function setWindowSizeGradual(
-//   window: BrowserWindow,
-//   width: number,
-//   height: number,
-//   duration: number
-// ): void {
-//   if (!workInProgress) {
-//     workInProgress = true
-//     let [curWidth, curHeight] = window.getContentSize()
-
-//     const widthGap = width - curWidth
-//     const widthStep = widthGap / (duration / interval)
-
-//     const heightGap = height - curHeight
-//     const heightStep = heightGap / (duration / interval)
-
-//     const timerId = setInterval(() => {
-//       if (curWidth < width || curHeight < height) {
-//         curWidth += widthStep
-
-//         curHeight += heightStep
-
-//         window.setContentSize(curWidth, curHeight)
-//       } else {
-//         clearInterval(timerId)
-//         workInProgress = false
-//       }
-//     }, interval)
-//   }
-// }
 
 function isPositionOnWindow(x: number, y: number, window: BrowserWindow): boolean {
   const [width, height] = window.getSize()

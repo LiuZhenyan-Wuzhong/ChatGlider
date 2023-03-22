@@ -33,8 +33,13 @@ import Button from '../commonComps/Button'
 import CodeExplain from './components/CodeExplain'
 import Polish from './components/Polish'
 import Chat from './components/Chat'
+import Tooltip from '../commonComps/Tooltip'
+import OpenAIIntro from './components/OpenAIIntro'
 
 export interface MainPanelContextI {
+  appUsage: AppUsage
+  setAppUsage: Dispatch<SetStateAction<AppUsage>>
+  isPin: boolean
   mainInput: string
   setMainInput: Dispatch<SetStateAction<string>>
   inputFromClipBoard: React.MutableRefObject<boolean>
@@ -72,7 +77,7 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
   // state
   const [mainInput, setMainInput] = useState<string>('')
 
-  const [appUsage, setAppUsage] = useState<AppUsage>(AppUsage.chat)
+  const [appUsage, setAppUsage] = useState<AppUsage>(AppUsage.translation)
 
   const [isPin, setIsPin] = useState<boolean>(false)
 
@@ -147,7 +152,16 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
       onBlur={handleBlur}
     >
       <MainPanelContext.Provider
-        value={{ mainInput, setMainInput, inputFromClipBoard, stream, setStream }}
+        value={{
+          appUsage,
+          setAppUsage,
+          isPin,
+          mainInput,
+          setMainInput,
+          inputFromClipBoard,
+          stream,
+          setStream
+        }}
       >
         <div className="w-full h-full relative flex flex-col text-gray-900 flex-grow">
           <Tabs.Root
@@ -160,50 +174,61 @@ export default function MainPanel({ className }: MainPanelProps): JSX.Element {
                 <div className="w-40 flex justify-start items-center">
                   <Tabs.List className="flex gap-1 p-1 bg-white rounded-lg">
                     {appUsageDescList.map(({ name, value, icon }, idx) => (
-                      <Tabs.Trigger
-                        key={idx}
-                        value={value}
-                        className={clsx(
-                          'w-8 h-6 py-1 px-2 flex items-center justify-center rounded-md',
-                          'data-[state=active]:bg-gray-200',
-                          'hover:bg-gray-300',
-                          'transition ease-in-out duration-200'
-                        )}
-                      >
-                        {icon}
-                      </Tabs.Trigger>
+                      <Tooltip content={name} key={idx}>
+                        <Tabs.Trigger
+                          value={value}
+                          className={clsx(
+                            'w-8 h-6 py-1 px-2 flex items-center justify-center rounded-md',
+                            'data-[state=active]:bg-gray-200',
+                            'hover:bg-gray-300',
+                            'transition ease-in-out duration-200'
+                          )}
+                        >
+                          {icon}
+                        </Tabs.Trigger>
+                      </Tooltip>
                     ))}
                   </Tabs.List>
                 </div>
 
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <OpenAIIcon />
-                </div>
+                <OpenAIIntro />
 
                 <div className="flex w-40 items-center justify-end gap-2">
                   {appMode === AppMode.bigger && (
-                    <Button onClick={handleToExpand}>
-                      <UpIcon />
-                    </Button>
+                    <Tooltip content="向上收缩">
+                      <Button onClick={handleToExpand}>
+                        <UpIcon />
+                      </Button>
+                    </Tooltip>
                   )}
 
                   {appMode === AppMode.expand && (
-                    <Button onClick={handleToBigger}>
-                      <DownIcon />
-                    </Button>
+                    <Tooltip content="向下展开">
+                      <Button onClick={handleToBigger}>
+                        <DownIcon />
+                      </Button>
+                    </Tooltip>
                   )}
 
-                  <Settings />
-                  <Toggle
-                    className={clsx('text-gray-600', isPin ? 'bg-gray-200 border-gray-300' : '')}
-                    pressed={isPin}
-                    onPressedChange={handlePressPin}
-                  >
-                    <PinIcon />
-                  </Toggle>
-                  <Button onClick={handleClose}>
-                    <CrossIcon />
-                  </Button>
+                  <Tooltip content="设置">
+                    <Settings />
+                  </Tooltip>
+
+                  <Tooltip content={isPin ? '取消置顶' : '置顶'}>
+                    <Toggle
+                      className={clsx('text-gray-600', isPin ? 'bg-gray-200 border-gray-300' : '')}
+                      pressed={isPin}
+                      onPressedChange={handlePressPin}
+                    >
+                      <PinIcon />
+                    </Toggle>
+                  </Tooltip>
+
+                  <Tooltip content="回到监听状态">
+                    <Button onClick={handleClose}>
+                      <CrossIcon />
+                    </Button>
+                  </Tooltip>
                 </div>
               </div>
             </div>
