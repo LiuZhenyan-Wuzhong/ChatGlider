@@ -107,9 +107,9 @@ interface CodeExplainProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 function CodeExplain({ className }: CodeExplainProps, ref): JSX.Element {
   // context
-  const { openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
+  const { openAIAPIRef, stream } = useContext(AppContext as Context<AppContextI>)
 
-  const { inputFromClipBoard, stream, mainInput } = useContext(
+  const { inputFromClipBoard, mainInput } = useContext(
     MainPanelContext as Context<MainPanelContextI>
   )
 

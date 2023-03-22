@@ -83,9 +83,9 @@ interface ChatProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 function Chat({ className }: ChatProps, ref): JSX.Element {
   // context
-  const { openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
+  const { openAIAPIRef, stream } = useContext(AppContext as Context<AppContextI>)
 
-  const { inputFromClipBoard, stream } = useContext(MainPanelContext as Context<MainPanelContextI>)
+  const { inputFromClipBoard } = useContext(MainPanelContext as Context<MainPanelContextI>)
 
   // state
   const [input, setInput] = useState<string>(``)

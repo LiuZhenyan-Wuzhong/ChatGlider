@@ -55,9 +55,9 @@ interface TranslationProps extends AllHTMLAttributes<HTMLDivElement> {}
 
 function Translation({ className }: TranslationProps, ref): JSX.Element {
   // context
-  const { openAIAPIKey, openAIAPIRef } = useContext(AppContext as Context<AppContextI>)
+  const { openAIAPIKey, openAIAPIRef, stream } = useContext(AppContext as Context<AppContextI>)
 
-  const { inputFromClipBoard, stream, mainInput } = useContext(
+  const { inputFromClipBoard, mainInput } = useContext(
     MainPanelContext as Context<MainPanelContextI>
   )
 
