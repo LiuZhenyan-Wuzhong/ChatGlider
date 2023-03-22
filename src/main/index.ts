@@ -237,7 +237,7 @@ app.whenReady().then(() => {
 
     if (isPositionOnWindow(x, y, mainWindow)) return
 
-    if (windowMode === WindowMode.expand) {
+    if (windowMode === WindowMode.expand || windowMode === WindowMode.bigger) {
       if (pin) {
         return
       } else {
