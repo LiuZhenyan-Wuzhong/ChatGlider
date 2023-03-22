@@ -97,7 +97,14 @@
     "productName":"ChatGlider",
     "appId":"ChatGlider",
     "win":{
-      "icon":"./public/img/favicon.ico"
+      "icon":"./public/img/favicon.ico",
+      "requestedExecutionLevel":"requireAdministrator",
+      "publish": {
+        "provider": "github",
+        "owner": "LiuZhenyan-Wuzhong",
+        "repo": "git@github.com:LiuZhenyan-Wuzhong/ChatGlider.git",
+        "token": "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"
+      }
     },
     "mac":{
       "icon":"./public/img/favicon.ico"
@@ -118,7 +125,6 @@
       "createStartMenuShortcut": true,
       "shortcutName": "ChatGlider"
     },
-    "requestedExecutionLevel":"requireAdministrator",
     "npmRebuild": false
   },
   "iohook": {
