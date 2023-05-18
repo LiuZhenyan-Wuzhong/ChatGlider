@@ -12,9 +12,9 @@ import OpenAIAPI from './api/openai/openaiAPI'
 import MainButton from './components/MainButton'
 import MainPanel from './components/MainPanel'
 
-const initOpenAIApiKey = import.meta.env['RENDERER_VITE_OPENAI_API_KEY'] || ''
+const initOpenAIApiKey = '' //import.meta.env['RENDERER_VITE_OPENAI_API_KEY'] || ''
 
-const initOpenAIUrl = import.meta.env['RENDERER_VITE_OPENAI_API_PROXY'] || 'https://api.openai.com'
+const initOpenAIUrl = 'https://api.openai.com' //import.meta.env['RENDERER_VITE_OPENAI_API_PROXY'] || 'https://api.openai.com'
 
 export interface AppContextI {
   appMode: AppMode
@@ -65,9 +65,9 @@ export default function App({ className }: AppProps): JSX.Element {
     window.electron.ipcRenderer.on('loadUserData', (event, storage) => {
       const { openAIAPIKey: _openAIAPIKey, openAIURL: _openAIURL, stream: _stream } = storage
 
-      // setOpenAIAPIKey(_openAIAPIKey || '')
-      // setOpenAIURL(_openAIURL || 'https://api.openai.com')
-      // setStream(_stream === undefined ? true : _stream)
+      setOpenAIAPIKey(_openAIAPIKey || '')
+      setOpenAIURL(_openAIURL || 'https://api.openai.com')
+      setStream(_stream === undefined ? true : _stream)
     })
   }, [])
 

@@ -9,13 +9,13 @@ import {
   clipboard,
   Notification
 } from 'electron'
-import fs from 'fs'
 import process from 'process'
 import fsPromises from 'fs/promises'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import copySelectedText from './copySelectedText'
 import { MouseDragHandler } from './handler'
+// import updateElectronApp from 'update-electron-app'
 
 enum WindowMode {
   expand = 'WindowMode/expand',
@@ -24,11 +24,18 @@ enum WindowMode {
   bigger = 'WindowMode/bigger'
 }
 
-const storagePath = path.join(app.getPath('userData'), 'storage.json')
+const getStoragePath = (function getStoragePath(): () => string {
+  let storagePath: string
+
+  return function () {
+    if (!storagePath) storagePath = path.join(app.getPath('userData'), 'storage.json')
+    return storagePath
+  }
+})()
 
 let ifCopyWhenExpand = true
 
-interface UsetStorage {
+interface UserStorage {
   openAIAPIKey?: string
   openAIURL?: string
   stream?: boolean
@@ -36,8 +43,12 @@ interface UsetStorage {
 }
 
 // read
-async function loadStorage(): Promise<UsetStorage> {
+async function loadStorage(): Promise<UserStorage> {
+  const storagePath = getStoragePath()
+
   try {
+    console.log(`load user storage from file: ${storagePath}`)
+
     const data = await fsPromises.readFile(storagePath, { encoding: 'utf-8', flag: 'r' })
 
     // init
@@ -58,7 +69,10 @@ async function loadStorage(): Promise<UsetStorage> {
 }
 
 // save
-async function saveStorage(data: UsetStorage): Promise<void> {
+async function saveStorage(data: UserStorage): Promise<void> {
+  const storagePath = getStoragePath()
+  console.log(storagePath)
+
   try {
     await fsPromises.writeFile(storagePath, JSON.stringify(data))
   } catch (err) {

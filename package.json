@@ -1,6 +1,6 @@
 {
-  "name": "electron_vite_demo",
-  "version": "1.0.2",
+  "name": "chat_glider",
+  "version": "1.0.3",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -62,6 +62,7 @@
     "node-abi": "^3.33.0",
     "node-gyp": "^9.3.1",
     "robotjs": "^0.6.0",
+    "update-electron-app": "^2.0.1",
     "uuid": "^9.0.0",
     "vite-plugin-svgr": "^2.4.0"
   },
@@ -94,17 +95,17 @@
   },
   "license": "MIT",
   "build": {
-    "productName":"ChatGlider",
-    "appId":"ChatGlider",
-    "win":{
-      "icon":"./public/img/favicon.ico",
-      "requestedExecutionLevel":"highestAvailable"
+    "productName": "ChatGlider",
+    "appId": "ChatGlider",
+    "win": {
+      "icon": "./public/img/favicon.ico",
+      "requestedExecutionLevel": "highestAvailable"
     },
-    "mac":{
-      "icon":"./public/img/favicon.ico"
+    "mac": {
+      "icon": "./public/img/favicon.ico"
     },
-    "linux":{
-      "icon":"./public/img/favicon.ico"
+    "linux": {
+      "icon": "./public/img/favicon.ico"
     },
     "nsis": {
       "oneClick": false,
