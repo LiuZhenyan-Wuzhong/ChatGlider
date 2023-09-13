@@ -32,6 +32,7 @@ export type OpenAIReqBody = {
   stream: boolean
 }
 
+// openaiAPI服务器对象，想其发送请求
 export default class OpenAIAPI {
   static fetchSSE = async (
     url: string,

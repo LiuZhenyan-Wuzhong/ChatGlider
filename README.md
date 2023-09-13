@@ -24,6 +24,14 @@
 本项目将不会获取您的任何私人数据，包括您的openAI_APIKey以及openAI_URL
 
 ## Build Your App
+
+### Environment
+```txt
+node = 18.12.0
+
+python = 3.9.6
+```
+
 ### Install
 
 ```bash
