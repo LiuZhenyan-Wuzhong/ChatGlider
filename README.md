@@ -23,6 +23,9 @@
 
 本项目将不会获取您的任何私人数据，包括您的openAI_APIKey以及openAI_URL
 
+## Download
+[发行版下载](https://github.com/LiuZhenyan-Wuzhong/ChatGlider/releases/tag/1.0.3)
+
 ## Build Your App
 
 ### Environment
