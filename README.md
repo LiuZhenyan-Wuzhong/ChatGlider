@@ -30,6 +30,8 @@
 node = 18.12.0
 
 python = 3.9.6
+
+visual studio = 2019
 ```
 
 ### Install
