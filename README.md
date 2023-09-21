@@ -67,6 +67,11 @@ $ npm run build:win
 $ yarn build:mac
 ```
 
+### PolyFill
+- iohook和robotjs两个包都不维护了, 但是node在更新, 所以没有能继续支持node18和electron22的构建好的包可以用。我build了一下这两个包,当然仅符合我的node和electron版本,将其手动放置到node_modules中的对应位置即可。对应文件在polyfill目录中，请阅读其中的PolyFill.md文件。
+
+
+### Social
 欢迎提出更新意见，贡献代码，有闲的产品同学可以一起玩。
 
 个人微信：
